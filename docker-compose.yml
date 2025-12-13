@@ -1,0 +1,41 @@
+version: '3.8'
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: illiterate_monkey_db
+    env_file:
+      - ./env/dev.env
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $POSTGRES_USER"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+    networks:
+      - monkey_network
+  
+  pg_admin:
+    image: dpage/pgadmin4:latest
+    container_name: illiterate_monkey_pgadmin
+    env_file:
+      - ./env/dev.env
+    ports:
+      - "8080:80"
+    volumes:
+      - pgadmin_data:/var/lib/pgadmin
+    depends_on:
+      - postgres
+    networks:
+      - monkey_network
+  
+networks:
+  monkey_network:
+    driver: bridge
+
+volumes:
+  pgdata:
+  pgadmin_data:

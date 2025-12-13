@@ -1,0 +1,51 @@
+repos:
+  # Python/FastAPI hooks
+  - repo: https://github.com/psf/black
+    rev: 25.1.0
+    hooks:
+      - id: black
+        language_version: python3.11
+        files: ^backend/
+
+  - repo: local
+    hooks:
+      - id: pytest
+        name: pytest
+        entry: bash -c 'cd backend && poetry run pytest'
+        language: system
+        pass_filenames: false
+        files: ^backend/
+        types: [python]
+        always_run: false
+
+  # Vue/Frontend hooks
+  - repo: https://github.com/pre-commit/mirrors-prettier
+    rev: v3.1.0
+    hooks:
+      - id: prettier
+        files: ^frontend/
+        types_or: [javascript, jsx, ts, tsx, vue, css, scss, json, markdown]
+
+  - repo: https://github.com/pre-commit/mirrors-eslint
+    rev: v9.15.0
+    hooks:
+      - id: eslint
+        files: ^frontend/
+        types_or: [javascript, jsx, ts, tsx, vue]
+        additional_dependencies:
+          - eslint@^9.0.0
+          - eslint-plugin-vue@^9.0.0
+          - '@typescript-eslint/parser@^8.0.0'
+          - '@typescript-eslint/eslint-plugin@^8.0.0'
+
+  # General hooks for both
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v5.0.0
+    hooks:
+      - id: trailing-whitespace
+      - id: end-of-file-fixer
+      - id: check-yaml
+      - id: check-added-large-files
+      - id: check-json
+      - id: check-toml
+      - id: check-merge-conflict
