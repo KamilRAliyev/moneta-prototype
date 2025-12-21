@@ -22,6 +22,26 @@
             }
           }
         ]
+      },
+      {
+        "id": "b132592bf023aa97",
+        "type": "tabs",
+        "children": [
+          {
+            "id": "d920965f1cc96de4",
+            "type": "leaf",
+            "state": {
+              "type": "markdown",
+              "state": {
+                "file": "Notes/Dev Cheat Sheet.md",
+                "mode": "source",
+                "source": false
+              },
+              "icon": "lucide-file",
+              "title": "Dev Cheat Sheet"
+            }
+          }
+        ]
       }
     ],
     "direction": "vertical"
@@ -78,7 +98,8 @@
       }
     ],
     "direction": "horizontal",
-    "width": 200
+    "width": 200,
+    "collapsed": true
   },
   "right": {
     "id": "3b9bd0bb0d5e1fb6",
@@ -187,8 +208,12 @@
       "periodic-notes:Open this week": false
     }
   },
-  "active": "44a1ac98d9863bfe",
+  "active": "d920965f1cc96de4",
   "lastOpenFiles": [
+    "Architecture/Moneta Code Architecture Document v0.1.md",
+    "Notes/Dev Cheat Sheet.md",
+    "Issues/MON-1. Run Moneta locally with one command.md",
+    "Weekly Notes/2025-W52.md",
     "Issues/MON-6. Structured logging.md",
     "Issues/MON-5. Upload placeholder (no processing).md",
     "Issues/Untitled.md",
@@ -196,14 +221,11 @@
     "Issues/MON-3. System info endpoint.md",
     "Issues/MON-3. API versioning structure.md",
     "Issues/MON-2. Alembic migrations baseline.md",
-    "Weekly Notes/2025-W52.md",
-    "Issues/MON-1. Run Moneta locally with one command.md",
     "Kanban Board.md",
     "Architecture/backend/Backend Package Structure.md",
     "Issues/asda.md",
     "templates/user-story.md.md",
     "Issues",
-    "Architecture/Moneta Code Architecture Document v0.1.md",
     "Architecture/backend",
     "Notes/Untitled.md",
     "templates/default-id.md",
