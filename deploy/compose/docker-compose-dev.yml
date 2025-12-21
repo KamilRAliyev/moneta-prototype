@@ -17,7 +17,7 @@ services:
       retries: 5
     networks:
       - monkey_network
-  
+
   pg_admin:
     image: dpage/pgadmin4:latest
     container_name: illiterate_monkey_pgadmin
@@ -31,7 +31,7 @@ services:
       - postgres
     networks:
       - monkey_network
-  
+
 networks:
   monkey_network:
     driver: bridge

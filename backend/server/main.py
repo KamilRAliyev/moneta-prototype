@@ -4,7 +4,7 @@ from server.services import health
 
 app = FastAPI(title="Moneta API", version="0.1.0")
 
-router = APIRouter(prefix="/api/v1")
+router = APIRouter(prefix="/api")
 
 
 @router.get("/health", tags=["Health"])

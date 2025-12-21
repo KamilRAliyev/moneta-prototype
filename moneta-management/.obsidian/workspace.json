@@ -33,12 +33,12 @@
             "state": {
               "type": "markdown",
               "state": {
-                "file": "Issues/MON-1. Run Moneta locally with one command.md",
+                "file": "Notes/Dev Cheat Sheet.md",
                 "mode": "source",
                 "source": false
               },
               "icon": "lucide-file",
-              "title": "MON-1. Run Moneta locally with one command"
+              "title": "Dev Cheat Sheet"
             }
           }
         ]
@@ -208,8 +208,10 @@
       "periodic-notes:Open this week": false
     }
   },
-  "active": "44a1ac98d9863bfe",
+  "active": "d920965f1cc96de4",
   "lastOpenFiles": [
+    "Architecture/Moneta Code Architecture Document v0.1.md",
+    "Notes/Dev Cheat Sheet.md",
     "Issues/MON-1. Run Moneta locally with one command.md",
     "Weekly Notes/2025-W52.md",
     "Issues/MON-6. Structured logging.md",
@@ -224,7 +226,6 @@
     "Issues/asda.md",
     "templates/user-story.md.md",
     "Issues",
-    "Architecture/Moneta Code Architecture Document v0.1.md",
     "Architecture/backend",
     "Notes/Untitled.md",
     "templates/default-id.md",
