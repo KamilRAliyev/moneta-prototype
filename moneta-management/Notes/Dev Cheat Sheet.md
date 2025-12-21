@@ -26,10 +26,10 @@ docker run --rm \
 ```
 
 What it does?
-	•	API available at: http://localhost:8000
-	•	Health check: http://localhost:8000/api/health/
-    •	Code changes → instant reload
-
+- API available at: http://localhost:8000
+- Health check: http://localhost:8000/api/health/
+- Code changes → instant reload
+- Swagger docs: http://localhost:8000/docs
 
 3️⃣ Start backend with Docker Compose (preferred)
 
@@ -43,3 +43,35 @@ To stop:
 ```bash
 docker compose -f deploy/compose/docker-compose-dev.yml down
 ```
+
+4️⃣ Run backend locally (without Docker)
+```bash
+cd backend
+poetry install
+poetry run uvicorn server.main:app --reload
+```
+
+5️⃣ Run tests
+```bash
+poetry install
+poetry run pytest
+```
+
+Inside Docker (one-off)
+```bash
+docker run --rm \
+  -v "$PWD/backend:/app/backend" \
+  moneta-backend-dev \
+  poetry run pytest
+```
+
+6️⃣ Clean up Docker artifacts
+```bash
+docker image prune
+docker container prune
+```
+⚠️ This removes unused images/containers.
+
+🔒 Environment variables
+mounted from: `env/dev.env`
+Loaded via: `ENV_FILE=/app/env/dev.env`
