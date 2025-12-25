@@ -9,14 +9,17 @@ All API endpoints are prefixed with `/api`.
 ## OpenAPI Documentation
 
 Interactive API documentation is available at:
-- Swagger UI: `/docs`
-- ReDoc: `/redoc`
+- Swagger UI: `/api/docs`
+- ReDoc: `/api/redoc`
+- OpenAPI JSON: `/api/openapi.json`
 
 ## Endpoints
 
+All API endpoints are versioned under `/api/v1`.
+
 ### Health
 
-#### `GET /api/health`
+#### `GET /api/v1/health`
 
 Health check endpoint.
 
@@ -36,7 +39,7 @@ Health check endpoint.
 
 ### System
 
-#### `GET /api/system/info`
+#### `GET /api/v1/system/info`
 
 Get system information including app version, environment, and database connection status.
 
@@ -54,7 +57,7 @@ Get system information including app version, environment, and database connecti
 - `environment` (string): Environment name from `ENVIRONMENT` env var or default
 - `database_connected` (boolean): Whether database connection is available
 
-#### `GET /api/system/data-dir/test`
+#### `GET /api/v1/system/data-dir/test`
 
 Test data directory read/write capabilities.
 
@@ -118,5 +121,5 @@ The following endpoints are planned but not yet implemented:
 
 - All endpoints return JSON responses
 - Error responses follow FastAPI's standard error format and include `request_id` for correlation
-- Versioned endpoints use `/api/v1/...` prefix
-- Legacy endpoints use `/api/...` prefix (health, system)
+- All endpoints are versioned under `/api/v1/...` prefix
+- OpenAPI documentation is available at `/api/docs`

@@ -12,6 +12,6 @@ So that imported files survive container restarts.
 - Created `data_dir` service with `ensure_data_dir()` and test utilities
 - Added `DATA_DIR` environment variable (default: `/data`)
 - Data directory initialized on app startup via lifespan handler
-- Added `GET /api/system/data-dir/test` endpoint for verification
+- Added `GET /api/v1/system/data-dir/test` endpoint for verification
 - Tests added and passing
 - Documentation updated

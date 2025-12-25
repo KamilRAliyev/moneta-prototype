@@ -27,9 +27,9 @@ docker run --rm \
 
 What it does?
 - API available at: http://localhost:8000
-- Health check: http://localhost:8000/api/health/
+- Health check: http://localhost:8000/api/v1/health
 - Code changes → instant reload
-- Swagger docs: http://localhost:8000/docs
+- Swagger docs: http://localhost:8000/api/docs
 
 3️⃣ Start backend with Docker Compose (preferred)
 

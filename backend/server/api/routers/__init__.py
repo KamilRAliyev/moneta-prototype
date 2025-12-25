@@ -1,5 +1,4 @@
 """API routers."""
 
-from server.api.routers import system, uploads
-
-__all__ = ["system", "uploads"]
+# Legacy routers are now under v1
+__all__ = []

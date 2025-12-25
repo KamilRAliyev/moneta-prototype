@@ -31,8 +31,11 @@ backend/
 │   ├── api/               # API routes
 │   │   └── routers/       # API route handlers
 │   │       ├── __init__.py # Router exports
-│   │       ├── system.py  # System information endpoints
-│   │       └── uploads.py # File upload endpoints (v1)
+│   │       └── v1/        # Version 1 API routers
+│   │           ├── __init__.py
+│   │           ├── health.py  # Health check endpoints
+│   │           ├── system.py  # System information endpoints
+│   │           └── uploads.py # File upload endpoints
 │   ├── services/          # Business logic services
 │   │   ├── __init__.py    # Service exports
 │   │   ├── health.py      # Health check service
@@ -150,16 +153,25 @@ Configuration and settings management module.
 
 ### `server/api/routers/` Module
 
-API route handlers organized by feature.
+API route handlers organized by version and feature.
 
-#### `server/api/routers/system.py`
+#### `server/api/routers/v1/` Module
+
+Version 1 API routers. All endpoints are prefixed with `/api/v1`.
+
+##### `server/api/routers/v1/health.py`
+- **Purpose**: Health check endpoints
+- **Endpoints**:
+  - `GET /api/v1/health` - Health check endpoint
+
+##### `server/api/routers/v1/system.py`
 - **Purpose**: System information endpoints
 - **Endpoints**:
-  - `GET /api/system/info` - System information (version, environment, database status)
-  - `GET /api/system/data-dir/test` - Test data directory read/write
+  - `GET /api/v1/system/info` - System information (version, environment, database status)
+  - `GET /api/v1/system/data-dir/test` - Test data directory read/write
 
-#### `server/api/routers/uploads.py`
-- **Purpose**: File upload endpoints (v1 API)
+##### `server/api/routers/v1/uploads.py`
+- **Purpose**: File upload endpoints
 - **Endpoints**:
   - `POST /api/v1/uploads` - Upload CSV file (placeholder, no processing)
 

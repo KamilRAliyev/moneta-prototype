@@ -13,8 +13,8 @@ client = TestClient(app)
 
 
 def test_system_info():
-    """Test GET /api/system/info endpoint."""
-    r = client.get("/api/system/info")
+    """Test GET /api/v1/system/info endpoint."""
+    r = client.get("/api/v1/system/info")
     assert r.status_code == 200
     data = r.json()
 
@@ -30,10 +30,10 @@ def test_system_info():
 
 
 def test_data_dir_test_endpoint():
-    """Test GET /api/system/data-dir/test endpoint."""
+    """Test GET /api/v1/system/data-dir/test endpoint."""
     with tempfile.TemporaryDirectory() as tmpdir:
         with patch("server.core.settings.app_settings.data_dir", tmpdir):
-            r = client.get("/api/system/data-dir/test")
+            r = client.get("/api/v1/system/data-dir/test")
             assert r.status_code == 200
             data = r.json()
 

@@ -11,14 +11,10 @@
             "id": "2392192a0815f4e7",
             "type": "leaf",
             "state": {
-              "type": "markdown",
-              "state": {
-                "file": "Issues/MON-7. API versioning structure.md",
-                "mode": "preview",
-                "source": false
-              },
+              "type": "empty",
+              "state": {},
               "icon": "lucide-file",
-              "title": "MON-7. API versioning structure"
+              "title": "New tab"
             }
           }
         ]
@@ -189,8 +185,9 @@
   },
   "active": "2392192a0815f4e7",
   "lastOpenFiles": [
-    "Architecture/backend/Logging.md",
     "Issues/MON-7. API versioning structure.md",
+    "Architecture/backend/Logging.md",
+    "Issues/MON-3. API versioning structure.md",
     "Notes/Dev Cheat Sheet.md",
     "Architecture/backend/API Endpoints.md",
     "Architecture/Docker Development Environment.md",
@@ -217,7 +214,6 @@
     "templates/default-id.md",
     "templates/default-id.md.md",
     "Notes/Untitled 1.md",
-    "templates/task-id.md",
     "Weekly Notes",
     "templates",
     "attachments",

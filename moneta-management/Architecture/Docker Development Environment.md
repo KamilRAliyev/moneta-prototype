@@ -185,7 +185,7 @@ docker-compose -f docker-compose-dev.yml up
 ### Accessing Services
 
 - **API**: http://localhost:8000
-- **API Docs**: http://localhost:8000/docs
+- **API Docs**: http://localhost:8000/api/docs
 - **pgAdmin**: http://localhost:8080
 - **PostgreSQL**: localhost:5432
 

@@ -9,8 +9,8 @@ from starlette.exceptions import HTTPException as StarletteHTTPException
 from server.core import settings
 from server.core.logging import get_logger, setup_logging
 from server.core.middleware import RequestIDMiddleware
-from server.services import health, data_dir
-from server.api.routers import system, uploads
+from server.services import data_dir
+from server.api.routers.v1 import health, system, uploads
 
 logger = get_logger(__name__)
 
@@ -36,7 +36,14 @@ async def lifespan(app: FastAPI):
     logger.info("Shutting down Moneta API")
 
 
-app = FastAPI(title="Moneta API", version="0.1.0", lifespan=lifespan)
+app = FastAPI(
+    title="Moneta API",
+    version="0.1.0",
+    lifespan=lifespan,
+    docs_url="/api/docs",
+    redoc_url="/api/redoc",
+    openapi_url="/api/openapi.json",
+)
 
 # Add request ID middleware
 app.add_middleware(RequestIDMiddleware)
@@ -119,14 +126,9 @@ async def general_exception_handler(request: Request, exc: Exception):
     )
 
 
-router = APIRouter(prefix="/api")
-
-
-@router.get("/health", tags=["Health"])
-def health_check():
-    return health.get_health_info()
-
-
-app.include_router(router)
-app.include_router(system.router, prefix="/api")
-app.include_router(uploads.router, prefix="/api/v1")
+# Versioned API v1 endpoints
+v1_router = APIRouter(prefix="/api/v1", tags=["v1"])
+v1_router.include_router(health.router)
+v1_router.include_router(system.router)
+v1_router.include_router(uploads.router)
+app.include_router(v1_router)

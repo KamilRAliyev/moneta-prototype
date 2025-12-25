@@ -138,7 +138,7 @@ def test_setup_logging_both_enabled():
 
 def test_request_id_middleware_adds_header():
     """Test that RequestIDMiddleware adds X-Request-ID to response."""
-    response = client.get("/api/health")
+    response = client.get("/api/v1/health")
 
     assert response.status_code == 200
     assert "X-Request-ID" in response.headers
@@ -150,7 +150,7 @@ def test_request_id_middleware_preserves_header():
     """Test that RequestIDMiddleware preserves X-Request-ID from request header."""
     test_request_id = "custom-request-id-12345"
 
-    response = client.get("/api/health", headers={"X-Request-ID": test_request_id})
+    response = client.get("/api/v1/health", headers={"X-Request-ID": test_request_id})
 
     assert response.status_code == 200
     assert "X-Request-ID" in response.headers
@@ -159,7 +159,7 @@ def test_request_id_middleware_preserves_header():
 
 def test_request_id_middleware_generates_uuid():
     """Test that RequestIDMiddleware generates valid UUID when header not present."""
-    response = client.get("/api/health")
+    response = client.get("/api/v1/health")
 
     assert response.status_code == 200
     assert "X-Request-ID" in response.headers
