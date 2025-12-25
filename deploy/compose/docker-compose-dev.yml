@@ -1,11 +1,9 @@
-version: '3.8'
-
 services:
   postgres:
     image: postgres:16-alpine
     container_name: illiterate_monkey_db
     env_file:
-      - ./env/dev.env
+      - ../../env/dev.env
     ports:
       - "5432:5432"
     volumes:
@@ -22,7 +20,7 @@ services:
     image: dpage/pgadmin4:latest
     container_name: illiterate_monkey_pgadmin
     env_file:
-      - ./env/dev.env
+      - ../../env/dev.env
     ports:
       - "8080:80"
     volumes:
@@ -31,6 +29,28 @@ services:
       - postgres
     networks:
       - monkey_network
+
+  backend:
+    build:
+      context: ../..
+      dockerfile: deploy/docker/Dockerfile
+    container_name: illiterate_monkey_backend
+    env_file:
+      - ../../env/dev.env
+    ports:
+      - "8000:8000"
+    volumes:
+      # Mount backend directory for live code changes
+      - ../../backend:/app/backend
+      # Mount env directory for environment variables
+      - ../../env:/app/env
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - monkey_network
+    environment:
+      - ENV_FILE=/app/env/dev.env
 
 networks:
   monkey_network:

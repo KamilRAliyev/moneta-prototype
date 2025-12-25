@@ -65,7 +65,40 @@ docker run --rm \
   poetry run pytest
 ```
 
-6️⃣ Clean up Docker artifacts
+6️⃣ Database Migrations (Alembic)
+
+Create a new migration:
+```bash
+cd backend
+poetry run alembic revision --autogenerate -m "Migration message"
+```
+
+Apply migrations:
+```bash
+poetry run alembic upgrade head
+```
+
+Rollback one migration:
+```bash
+poetry run alembic downgrade -1
+```
+
+Show current revision:
+```bash
+poetry run alembic current
+```
+
+Inside Docker (one-off):
+```bash
+docker run --rm \
+  -v "$PWD/backend:/app/backend" \
+  -v "$PWD/env:/app/env" \
+  -e ENV_FILE=/app/env/dev.env \
+  moneta-backend-dev \
+  poetry run alembic upgrade head
+```
+
+7️⃣ Clean up Docker artifacts
 ```bash
 docker image prune
 docker container prune
@@ -75,3 +108,7 @@ docker container prune
 🔒 Environment variables
 mounted from: `env/dev.env`
 Loaded via: `ENV_FILE=/app/env/dev.env`
+
+Database settings (DB_*):
+- `DB_HOST`, `DB_PORT`, `DB_USER`, `DB_PASSWORD`, `DB_NAME`
+- See `server/core/settings/database.py` for all options
