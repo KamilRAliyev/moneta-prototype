@@ -44,6 +44,21 @@ This document lists all environment variables used in the Moneta project, their 
 | `ENVIRONMENT` | Environment name (dev, staging, prod) | `development` | `development` | No |
 | `DATA_DIR` | Path to persistent data directory | `/data` | `/data` | No |
 
+## Logging Configuration
+
+| Variable | Purpose | Default | Sample Value | Required |
+|----------|---------|---------|--------------|----------|
+| `LOGGING_STANDARD_ENABLED` | Enable standard (human-readable) logging | `true` | `true` or `false` | No |
+| `LOGGING_JSON_ENABLED` | Enable JSON logging for Loki/monitoring | `true` | `true` or `false` | No |
+| `LOGGING_LEVEL` | Log level | `INFO` | `DEBUG`, `INFO`, `WARNING`, `ERROR`, `CRITICAL` | No |
+
+**Notes:**
+- Standard logging outputs to stdout in human-readable format
+- JSON logging outputs to stderr in structured format (for Loki integration)
+- Both loggers can be enabled simultaneously
+- If both are disabled, standard logging is automatically enabled as fallback
+- All logs include `request_id` for correlation across services
+
 ## Grafana Configuration (if used)
 
 | Variable | Purpose | Default | Sample Value | Required |

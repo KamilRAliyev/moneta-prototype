@@ -47,6 +47,48 @@ def ensure_data_dir() -> Path:
     return data_path
 
 
+def ensure_uploads_dir() -> Path:
+    """Ensure uploads directory exists within data directory.
+
+    Returns:
+        Path to the uploads directory
+
+    Raises:
+        OSError: If directory cannot be created or is not writable
+    """
+    data_path = ensure_data_dir()
+    uploads_path = data_path / "uploads"
+
+    # Create directory if it doesn't exist
+    try:
+        uploads_path.mkdir(parents=True, exist_ok=True)
+    except PermissionError as e:
+        raise OSError(
+            f"Permission denied creating uploads directory {uploads_path}. "
+            f"Check volume mount permissions. Error: {e}"
+        ) from e
+
+    # Try to set permissions (may fail if not root, but that's ok)
+    try:
+        os.chmod(uploads_path, 0o755)
+    except (OSError, PermissionError):
+        # Ignore permission errors when setting chmod
+        pass
+
+    # Check if directory is writable
+    if not os.access(uploads_path, os.W_OK):
+        # Try to get more info about the issue
+        stat_info = uploads_path.stat()
+        raise OSError(
+            f"Uploads directory {uploads_path} is not writable. "
+            f"Mode: {oct(stat_info.st_mode)}, Owner: {stat_info.st_uid}, "
+            f"Group: {stat_info.st_gid}. "
+            f"Check Docker volume mount permissions."
+        )
+
+    return uploads_path
+
+
 def test_data_dir_write() -> dict:
     """Test writing to data directory.
 

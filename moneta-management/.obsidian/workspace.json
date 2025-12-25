@@ -13,12 +13,12 @@
             "state": {
               "type": "markdown",
               "state": {
-                "file": "Architecture/backend/Database.md",
-                "mode": "source",
+                "file": "Issues/MON-7. API versioning structure.md",
+                "mode": "preview",
                 "source": false
               },
               "icon": "lucide-file",
-              "title": "Database"
+              "title": "MON-7. API versioning structure"
             }
           }
         ]
@@ -187,21 +187,24 @@
       "periodic-notes:Open this week": false
     }
   },
-  "active": "5f6486e32759b139",
+  "active": "2392192a0815f4e7",
   "lastOpenFiles": [
-    "Architecture/backend/Database.md",
-    "Architecture/backend/Testing.md",
+    "Architecture/backend/Logging.md",
+    "Issues/MON-7. API versioning structure.md",
     "Notes/Dev Cheat Sheet.md",
-    "Architecture/Environment Variables.md",
-    "Architecture/Moneta Code Architecture Document v0.1.md",
-    "Architecture/backend/Backend Package Structure.md",
-    "Issues/MON-2. Alembic migrations baseline.md",
-    "Issues/MON-3. API versioning structure.md",
+    "Architecture/backend/API Endpoints.md",
+    "Architecture/Docker Development Environment.md",
     "Issues/MON-6. Structured logging.md",
+    "Architecture/backend/Testing.md",
+    "Issues/MON-2. Alembic migrations baseline.md",
+    "Issues/MON-1. Run Moneta locally with one command.md",
+    "Architecture/Moneta Code Architecture Document v0.1.md",
+    "Architecture/Environment Variables.md",
+    "Architecture/backend/Database.md",
+    "Architecture/backend/Backend Package Structure.md",
     "Issues/MON-5. Upload placeholder (no processing).md",
     "Issues/MON-4. Persistent data directory.md",
     "Issues/MON-3. System info endpoint.md",
-    "Issues/MON-1. Run Moneta locally with one command.md",
     "Weekly Notes/2025-W52.md",
     "Notes",
     "Issues/Untitled.md",
@@ -215,9 +218,6 @@
     "templates/default-id.md.md",
     "Notes/Untitled 1.md",
     "templates/task-id.md",
-    "templates/Untitled 1.md",
-    "Untitled.md",
-    "Notes/asdas.md",
     "Weekly Notes",
     "templates",
     "attachments",

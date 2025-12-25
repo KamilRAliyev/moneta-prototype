@@ -78,16 +78,45 @@ Test data directory read/write capabilities.
 }
 ```
 
+### Uploads (v1)
+
+#### `POST /api/v1/uploads`
+
+Upload a CSV file for ingestion. Files are saved without parsing or validation (placeholder implementation).
+
+**Request:**
+- Content-Type: `multipart/form-data`
+- Body: File upload (form field: `file`)
+
+**Response (201 Created):**
+```json
+{
+  "file_id": "550e8400-e29b-41d4-a716-446655440000",
+  "path": "/data/uploads/550e8400-e29b-41d4-a716-446655440000.csv",
+  "filename": "data.csv"
+}
+```
+
+**Response Fields:**
+- `file_id` (string): Unique UUID identifier for the uploaded file
+- `path` (string): Full filesystem path where the file was saved
+- `filename` (string): Original filename from the upload
+
+**Notes:**
+- Files are saved to `/data/uploads/{uuid}.csv`
+- No file parsing or validation is performed (placeholder)
+- File size limits are determined by FastAPI defaults
+
 ## Future Endpoints
 
 The following endpoints are planned but not yet implemented:
 
-- `/api/v1/...` - Versioned API endpoints (see [MON-3. API versioning structure.md](../../Issues/MON-3.%20API%20versioning%20structure.md))
-- Upload/ingestion endpoints
 - Reporting endpoints
+- File processing and validation endpoints
 
 ## Notes
 
 - All endpoints return JSON responses
-- Error responses follow FastAPI's standard error format
-- The API currently uses `/api/...` prefix. Future versioning will move to `/api/v1/...` structure
+- Error responses follow FastAPI's standard error format and include `request_id` for correlation
+- Versioned endpoints use `/api/v1/...` prefix
+- Legacy endpoints use `/api/...` prefix (health, system)

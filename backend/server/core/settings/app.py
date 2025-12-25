@@ -24,3 +24,17 @@ class AppSettings:
 
         # Data directory for persistent storage
         self.data_dir: str = os.getenv("DATA_DIR", "/data")
+
+        # Logging configuration
+        # Enable standard (human-readable) logging (default: true)
+        self.logging_standard_enabled: bool = os.getenv(
+            "LOGGING_STANDARD_ENABLED", "true"
+        ).lower() in ("true", "1", "yes")
+
+        # Enable JSON logging for Loki/monitoring (default: true)
+        self.logging_json_enabled: bool = os.getenv(
+            "LOGGING_JSON_ENABLED", "true"
+        ).lower() in ("true", "1", "yes")
+
+        # Log level (default: INFO)
+        self.logging_level: str = os.getenv("LOGGING_LEVEL", "INFO").upper()
