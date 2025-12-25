@@ -9,6 +9,7 @@ This document describes the test suite for the backend application.
 - `test_database_connection.py` - Database connection and session management tests
 - `test_models.py` - Database models tests
 - `test_alembic.py` - Alembic migrations configuration tests
+- `test_system.py` - System information endpoints tests
 - `conftest.py` - Pytest fixtures and configuration
 
 ## Running Tests
@@ -53,6 +54,8 @@ The test suite covers:
 ✅ Model inheritance and metadata
 ✅ Alembic configuration
 ✅ Migration folder structure
+✅ System information endpoints
+✅ Data directory management
 
 ## Test Structure
 
@@ -64,5 +67,6 @@ tests/
 ├── test_database_settings.py # Database settings tests
 ├── test_database_connection.py # Database connection tests
 ├── test_models.py           # Model tests
-└── test_alembic.py          # Alembic configuration tests
+├── test_alembic.py          # Alembic configuration tests
+└── test_system.py           # System endpoints tests
 ```

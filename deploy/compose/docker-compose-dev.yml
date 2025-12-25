@@ -44,6 +44,8 @@ services:
       - ../../backend:/app/backend
       # Mount env directory for environment variables
       - ../../env:/app/env
+      # Mount persistent data directory
+      - moneta_data:/data
     depends_on:
       postgres:
         condition: service_healthy
@@ -51,6 +53,8 @@ services:
       - monkey_network
     environment:
       - ENV_FILE=/app/env/dev.env
+    # Run as root to ensure volume permissions can be set
+    user: root
 
 networks:
   monkey_network:
@@ -59,3 +63,4 @@ networks:
 volumes:
   pgdata:
   pgadmin_data:
+  moneta_data:

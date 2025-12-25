@@ -1,0 +1,93 @@
+# API Endpoints
+
+This document lists all available API endpoints in the Moneta backend.
+
+## Base URL
+
+All API endpoints are prefixed with `/api`.
+
+## OpenAPI Documentation
+
+Interactive API documentation is available at:
+- Swagger UI: `/docs`
+- ReDoc: `/redoc`
+
+## Endpoints
+
+### Health
+
+#### `GET /api/health`
+
+Health check endpoint.
+
+**Response:**
+```json
+{
+  "status": "ok",
+  "server_time": "2025-12-25 00:00:00",
+  "python_version": "3.13.7",
+  "system": "Darwin",
+  "hostname": "hostname",
+  "process_id": 12345,
+  "uptime_seconds": 123456,
+  "app_version": "0.1.0"
+}
+```
+
+### System
+
+#### `GET /api/system/info`
+
+Get system information including app version, environment, and database connection status.
+
+**Response:**
+```json
+{
+  "app_version": "0.1.0",
+  "environment": "development",
+  "database_connected": true
+}
+```
+
+**Fields:**
+- `app_version` (string): Application version from `APP_VERSION` env var or default
+- `environment` (string): Environment name from `ENVIRONMENT` env var or default
+- `database_connected` (boolean): Whether database connection is available
+
+#### `GET /api/system/data-dir/test`
+
+Test data directory read/write capabilities.
+
+**Response (success):**
+```json
+{
+  "status": "ok",
+  "data_dir": "/data",
+  "writable": true,
+  "test_passed": true
+}
+```
+
+**Response (error):**
+```json
+{
+  "status": "error",
+  "data_dir": "/data",
+  "writable": false,
+  "error": "Error message"
+}
+```
+
+## Future Endpoints
+
+The following endpoints are planned but not yet implemented:
+
+- `/api/v1/...` - Versioned API endpoints (see [MON-3. API versioning structure.md](../../Issues/MON-3.%20API%20versioning%20structure.md))
+- Upload/ingestion endpoints
+- Reporting endpoints
+
+## Notes
+
+- All endpoints return JSON responses
+- Error responses follow FastAPI's standard error format
+- The API currently uses `/api/...` prefix. Future versioning will move to `/api/v1/...` structure

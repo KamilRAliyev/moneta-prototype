@@ -18,6 +18,9 @@ kanban-plugin: board
 
 ## Done
 
+- [x] MON-3: System info endpoint (Backend complete)
+- [x] MON-4: Persistent data directory
+
 
 
 

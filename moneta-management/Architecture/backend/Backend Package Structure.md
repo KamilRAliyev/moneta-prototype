@@ -24,10 +24,18 @@ backend/
 │   │   ├── database.py    # Database connection utilities
 │   │   └── settings/      # Configuration and settings module
 │   │       ├── __init__.py # Package initialization
-│   │       └── database.py # Database configuration settings
+│   │       ├── database.py # Database configuration settings
+│   │       └── app.py     # Application configuration settings
 │   ├── api/               # API routes
 │   │   └── routers/       # API route handlers
+│   │       ├── __init__.py # Router exports
+│   │       └── system.py  # System information endpoints
+│   │       ├── __init__.py # Router exports
+│   │       └── system.py  # System information endpoints
 │   ├── services/          # Business logic services
+│   │   ├── __init__.py    # Service exports
+│   │   ├── health.py      # Health check service
+│   │   └── data_dir.py    # Data directory management service
 │   └── main.py            # FastAPI application entry point
 └── tests/                  # Test suite directory
     └── __init__.py         # Package initialization
@@ -59,6 +67,7 @@ Main application package containing the FastAPI application code.
 #### `server/main.py`
 - FastAPI application entry point
 - Application initialization and route registration
+- Lifespan event handler for startup/shutdown (data directory initialization)
 
 ### `server/models/` Module
 
@@ -103,6 +112,39 @@ Configuration and settings management module.
   - `database_url`: Async PostgreSQL URL for SQLAlchemy
   - `database_url_sync`: Sync PostgreSQL URL for Alembic
 
+#### `server/core/settings/app.py`
+- **Purpose**: Application configuration settings
+- **Class**: `AppSettings`
+- **Environment Variables**:
+  - `APP_VERSION` (default: 0.1.0) - Application version
+  - `ENVIRONMENT` (default: development) - Environment name (dev, staging, prod)
+  - `DATA_DIR` (default: /data) - Path to persistent data directory
+
+### `server/api/routers/` Module
+
+API route handlers organized by feature.
+
+#### `server/api/routers/system.py`
+- **Purpose**: System information endpoints
+- **Endpoints**:
+  - `GET /api/system/info` - System information (version, environment, database status)
+  - `GET /api/system/data-dir/test` - Test data directory read/write
+
+### `server/services/` Module
+
+Business logic and utility services.
+
+#### `server/services/health.py`
+- **Purpose**: Health check service
+- **Functions**:
+  - `get_health_info()` - Returns health information
+
+#### `server/services/data_dir.py`
+- **Purpose**: Data directory management service
+- **Functions**:
+  - `ensure_data_dir()` - Creates and verifies data directory is writable
+  - `test_data_dir_write()` - Tests read/write capabilities
+
 ### `migrations/` Directory
 
 Alembic migration files and configuration.
@@ -134,6 +176,7 @@ Test suite directory for unit and integration tests.
 - `test_database_connection.py` - Database connection tests
 - `test_models.py` - Model tests
 - `test_alembic.py` - Alembic configuration tests
+- `test_system.py` - System endpoints tests
 
 For detailed testing documentation, see [Testing.md](./Testing.md).
 
@@ -147,6 +190,7 @@ For detailed testing documentation, see [Testing.md](./Testing.md).
 
 ## Environment Variables
 
+### Database Configuration
 - `DB_HOST`: Database host (default: localhost)
 - `DB_PORT`: Database port (default: 5432)
 - `DB_USER`: Database user (default: postgres)
@@ -157,15 +201,25 @@ For detailed testing documentation, see [Testing.md](./Testing.md).
 - `DB_POOL_PRE_PING`: Enable connection health checks (default: true)
 - `DB_ECHO`: Echo SQL queries (default: false)
 
+### Application Configuration
+- `APP_VERSION`: Application version (default: 0.1.0)
+- `ENVIRONMENT`: Environment name (default: development)
+- `DATA_DIR`: Path to persistent data directory (default: /data)
+
+For complete environment variable documentation, see [Environment Variables.md](../Environment%20Variables.md).
+
 ## Initial State
 
 This is the current structure of the backend package. The following components are in place:
 
 - ✅ Project configuration (Poetry)
 - ✅ Database configuration and connection management
+- ✅ Application settings (version, environment, data directory)
 - ✅ Alembic migrations setup
 - ✅ Models structure with base class
 - ✅ Database session utilities for FastAPI
+- ✅ API routers (health, system)
+- ✅ Services (health, data directory management)
 - ✅ Test directory structure
 
 ## Database Migrations

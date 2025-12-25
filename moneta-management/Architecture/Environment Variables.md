@@ -40,6 +40,9 @@ This document lists all environment variables used in the Moneta project, their 
 |----------|---------|---------|--------------|----------|
 | `PORT` | Application server port | `8000` | `8000` | No |
 | `ENV_FILE` | Path to environment file | - | `/app/env/dev.env` | No |
+| `APP_VERSION` | Application version | `0.1.0` | `0.1.0` | No |
+| `ENVIRONMENT` | Environment name (dev, staging, prod) | `development` | `development` | No |
+| `DATA_DIR` | Path to persistent data directory | `/data` | `/data` | No |
 
 ## Grafana Configuration (if used)
 
