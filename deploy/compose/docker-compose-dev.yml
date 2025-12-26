@@ -30,22 +30,27 @@ services:
     networks:
       - monkey_network
 
-  backend:
+  app:
     build:
       context: ../..
       dockerfile: deploy/docker/Dockerfile
-    container_name: illiterate_monkey_backend
+    container_name: illiterate_monkey_app
     env_file:
       - ../../env/dev.env
     ports:
-      - "8000:8000"
+      - "8000:8000"  # Backend API
+      - "5173:5173"   # Frontend Vite dev server
     volumes:
       # Mount backend directory for live code changes
       - ../../backend:/app/backend
+      # Mount frontend directory for live code changes
+      - ../../frontend:/app/frontend
       # Mount env directory for environment variables
       - ../../env:/app/env
       # Mount persistent data directory
       - moneta_data:/data
+      # Mount node_modules to avoid reinstalling on every change
+      - frontend_node_modules:/app/frontend/node_modules
     depends_on:
       postgres:
         condition: service_healthy
@@ -64,3 +69,4 @@ volumes:
   pgdata:
   pgadmin_data:
   moneta_data:
+  frontend_node_modules:

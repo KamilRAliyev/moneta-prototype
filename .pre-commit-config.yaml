@@ -38,6 +38,17 @@ repos:
           - '@typescript-eslint/parser@^8.0.0'
           - '@typescript-eslint/eslint-plugin@^8.0.0'
 
+  - repo: local
+    hooks:
+      - id: vitest
+        name: vitest
+        entry: bash -c 'cd frontend && npm run test:run'
+        language: system
+        pass_filenames: false
+        files: ^frontend/
+        types_or: [javascript, jsx, ts, tsx, vue]
+        always_run: false
+
   # General hooks for both
   - repo: https://github.com/pre-commit/pre-commit-hooks
     rev: v5.0.0

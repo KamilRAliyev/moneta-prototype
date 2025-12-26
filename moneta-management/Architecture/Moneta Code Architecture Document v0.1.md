@@ -22,7 +22,7 @@ moneta/
 	        adapters/             # IO boundaries (db, files, external)
 	    db/
 	        models.py
-	        migrations/           # Alembic    
+	        migrations/           # Alembic
 	    workers/                  # background jobs (optional v1)
 	        observability/        # logging, metrics, tracing stubs
 		tests/                    # tests
@@ -33,11 +33,20 @@ moneta/
 		dev.template              # Template with needed vars to populate
 	frontend/                     # Vue 3 app
       src/
-      public/
-      index.html
-      vite.config.ts
-      package.json
-      tests/
+        main.ts              # Application entry point
+        App.vue              # Root component
+        components/          # Reusable components
+        views/               # Route-level pages
+        router/              # Vue Router configuration
+        stores/              # Pinia state management
+        style.css            # Global styles
+      public/                # Static assets
+      index.html             # HTML entry point
+      vite.config.ts         # Vite build configuration
+      package.json           # npm dependencies
+      tsconfig.json          # TypeScript configuration
+      tsconfig.app.json      # TypeScript app config
+      tsconfig.node.json     # TypeScript node config
   deploy/
     docker/
       Dockerfile
@@ -47,18 +56,44 @@ moneta/
       docker-compose.prod.yml
 ```
 
-# 3) **Container strategy (single image)**
+# 3) **Container strategy**
 
-## 3.1) Build  Steps (multi-staged Dockerfile)
+## 3.1) Development Container (single container, dual services)
 
-- Stage A: build Vue -> frontend/src/dist
-- Stage B: Install Python depth + mount backend folder
-- Copy dist/ into backend package (or /static folder)
--  Run FastAPI with Gunicorn+Uvicorn workers
+The development environment uses a single container that runs both backend and frontend:
 
-## 3.2) Serving frontend
+- **Container**: `illiterate_monkey_app`
+- **Base Image**: `python:3.11-slim` with Node.js 20.x installed
+- **Services Running**:
+  1. FastAPI backend (Uvicorn with `--reload`) on port 8000
+  2. Vite dev server (frontend) on port 5173
+- **Hot Reload**: Both services support hot-reload via volume mounts
+- **Volume Mounts**:
+  - Backend code: `../../backend:/app/backend`
+  - Frontend code: `../../frontend:/app/frontend`
+  - Frontend node_modules: Preserved in named volume
 
-FastAPI mounts:
+## 3.2) Production Build Steps (multi-staged Dockerfile - future)
+
+For production, the build will use a multi-stage approach:
+
+- Stage A: Build Vue frontend
+  - Install npm dependencies
+  - Run `npm run build` (type check + Vite build)
+  - Output: `frontend/dist/` directory with static assets
+- Stage B: Install Python dependencies + mount backend folder
+  - Install Poetry dependencies
+  - Copy backend code
+  - Copy `frontend/dist/` into backend package (or `/static` folder)
+- Stage C: Run FastAPI with Gunicorn+Uvicorn workers
+  - FastAPI serves static files from `dist/`
+  - SPA fallback: unknown routes return `index.html`
+
+## 3.3) Serving frontend
+
+**Development**: Frontend is served by Vite dev server on port 5173 with HMR
+
+**Production** (future): FastAPI will mount:
 - StaticFiles(directory=".../dist")
 - SPA fallback: unknown routes return index.html
 
@@ -78,11 +113,44 @@ Example routing convention:
 - PreCommit
 - Linters:
     - Python: ruff + mypy (optional)
-    - Vue: eslint + typecheck
+    - Vue/TypeScript: eslint + vue-tsc typecheck
 - Test:
-	- Pytest
+	- Backend: Pytest
+	- Frontend: Vitest + Vue Test Utils (configured and working)
 - Build docker image
+  - Build frontend (npm run build)
+  - Build backend container
 - Run smoke test
+
+# 6) Frontend Architecture
+
+## 6.1) Technology Stack
+- **Framework**: Vue 3 (Composition API)
+- **Language**: TypeScript
+- **Build Tool**: Vite
+- **Routing**: Vue Router 4
+- **State Management**: Pinia
+- **Styling**: Tailwind CSS 4
+
+## 6.2) Frontend Structure
+- **Views** (`src/views/`): Route-level page components
+- **Components** (`src/components/`): Reusable UI components
+- **Stores** (`src/stores/`): Pinia state management (Composition API style)
+- **Router** (`src/router/`): Vue Router configuration and routes
+
+## 6.3) Development Workflow
+- **Dev Server**: `npm run dev` (Vite with HMR)
+- **Build**: `npm run build` (TypeScript check + Vite build)
+- **Preview**: `npm run preview` (Test production build)
+
+## 6.4) Frontend-Backend Communication
+- REST API calls to `/api/v1/*` endpoints
+- (Future) API service layer for centralized communication
+- (Future) Error handling and loading states
+
+For detailed frontend documentation, see:
+- [Frontend Package Structure](./frontend/Frontend%20Package%20Structure.md)
+- [Frontend Architecture](./frontend/Frontend%20Architecture.md)
 
 ```mermaid
 flowchart TB
@@ -93,9 +161,17 @@ flowchart TB
     subgraph C["Moneta Application Container"]
         direction TB
 
-        FE[Vue 3 SPA<br/>Static Assets]
+        FE[Vue 3 SPA<br/>Static Assets<br/>Vue Router • Pinia • Tailwind]
 
         API[FastAPI Application]
+
+        subgraph FL["Frontend Architecture"]
+            direction TB
+            Views[Views<br/>Route Pages]
+            Components[Components<br/>Reusable UI]
+            Router[Vue Router<br/>Navigation]
+            Stores[Pinia Stores<br/>State Management]
+        end
 
         subgraph BL["Backend Internal Architecture"]
             direction TB
@@ -105,8 +181,12 @@ flowchart TB
             Adapters[Adapters<br/>DB • File • External APIs]
         end
 
-        FE --> API
-        API --> Routes
+    FE --> Views
+    Views --> Components
+    Views --> Router
+    Views --> Stores
+    Stores --> API
+    API --> Routes
         Routes --> Services
         Services --> Domain
         Domain --> Adapters

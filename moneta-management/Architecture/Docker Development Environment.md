@@ -5,7 +5,7 @@ This document describes the Docker-based development environment architecture fo
 ## Overview
 
 The development environment uses Docker Compose to orchestrate multiple services:
-- **Backend**: FastAPI application with hot-reload
+- **App**: Single container running both FastAPI backend and Vue 3 frontend with hot-reload
 - **PostgreSQL**: Database server
 - **pgAdmin**: Database administration tool
 
@@ -19,10 +19,12 @@ graph TB
     end
 
     subgraph DockerNetwork["Docker Network: monkey_network"]
-        subgraph BackendContainer["Backend Container<br/>illiterate_monkey_backend"]
-            BackendApp[FastAPI App<br/>Port 8000]
+        subgraph AppContainer["App Container<br/>illiterate_monkey_app"]
+            BackendApp[FastAPI App<br/>Port 8000<br/>Hot Reload]
+            FrontendApp[Vite Dev Server<br/>Port 5173<br/>Hot Reload]
             BackendCode[Mounted Code<br/>/app/backend]
-            BackendEnv[Mounted Env<br/>/app/env]
+            FrontendCode[Mounted Code<br/>/app/frontend]
+            AppEnv[Mounted Env<br/>/app/env]
         end
 
         subgraph PostgresContainer["PostgreSQL Container<br/>illiterate_monkey_db"]
@@ -45,16 +47,21 @@ graph TB
     subgraph External["External Access"]
         Browser[Developer Browser]
         LocalPort8000[localhost:8000<br/>API & Docs]
+        LocalPort5173[localhost:5173<br/>Frontend Dev]
         LocalPort5432[localhost:5432<br/>PostgreSQL]
         LocalPort8080[localhost:8080<br/>pgAdmin]
     end
 
     %% Connections
     HostCode -.->|Volume Mount| BackendCode
-    HostEnv -.->|Volume Mount| BackendEnv
+    HostCode -.->|Volume Mount| FrontendCode
+    HostEnv -.->|Volume Mount| AppEnv
     BackendCode --> BackendApp
-    BackendEnv --> BackendApp
+    FrontendCode --> FrontendApp
+    AppEnv --> BackendApp
+    AppEnv --> FrontendApp
     BackendApp -->|Connects| PostgresDB
+    FrontendApp -->|API Calls| BackendApp
     BackendApp -->|Writes| VolumeMonetaData
     PostgresDB --> PostgresData
     PostgresData --> VolumePgData
@@ -63,8 +70,10 @@ graph TB
     PgAdminData --> VolumePgAdmin
 
     Browser --> LocalPort8000
+    Browser --> LocalPort5173
     Browser --> LocalPort8080
     LocalPort8000 --> BackendApp
+    LocalPort5173 --> FrontendApp
     LocalPort8080 --> PgAdminUI
     LocalPort5432 --> PostgresDB
 
@@ -76,7 +85,7 @@ graph TB
     classDef service fill:#fce7f3,stroke:#db2777,stroke-width:2px
 
     class HostCode,HostEnv host
-    class BackendContainer,PostgresContainer,PgAdminContainer container
+    class AppContainer,PostgresContainer,PgAdminContainer container
     class VolumePgData,VolumePgAdmin,VolumeMonetaData,PostgresData,PgAdminData volume
     class Browser,LocalPort8000,LocalPort5432,LocalPort8080 external
     class BackendApp,PostgresDB,PgAdminUI service
@@ -84,25 +93,36 @@ graph TB
 
 ## Services
 
-### Backend Service
+### App Service
 
-**Container**: `illiterate_monkey_backend`
+**Container**: `illiterate_monkey_app`
 **Image**: Built from `deploy/docker/Dockerfile`
-**Port**: `8000:8000` (host:container)
+**Ports**:
+- `8000:8000` (host:container) - Backend API
+- `5173:5173` (host:container) - Frontend Vite dev server
 
 **Features**:
-- Hot-reload enabled for development
-- Source code mounted as volume for live changes
+- Runs both FastAPI backend and Vue 3 frontend in a single container
+- Hot-reload enabled for both services
+- Source code mounted as volumes for live changes
 - Environment variables loaded from `env/dev.env`
 - Persistent data directory mounted at `/data`
+- Frontend dependencies preserved in named volume
 
 **Volume Mounts**:
-- `../../backend:/app/backend` - Source code (read/write)
+- `../../backend:/app/backend` - Backend source code (read/write)
+- `../../frontend:/app/frontend` - Frontend source code (read/write)
 - `../../env:/app/env` - Environment files (read)
 - `moneta_data:/data` - Persistent data directory
+- `frontend_node_modules:/app/frontend/node_modules` - Preserves npm dependencies
+
+**Processes**:
+- **Backend**: Uvicorn with `--reload` watching `/app/backend/server`
+- **Frontend**: Vite dev server with HMR on port 5173
 
 **Dependencies**:
 - Waits for PostgreSQL to be healthy before starting
+- Installs frontend dependencies on startup if `node_modules` is missing
 
 ### PostgreSQL Service
 
@@ -155,15 +175,20 @@ graph TB
 
 3. **moneta_data**: Application data directory
    - Location: Docker managed volume
-   - Mounted at: `/data` in backend container
+   - Mounted at: `/data` in app container
    - Purpose: Persist uploaded files and application data
+
+4. **frontend_node_modules**: Frontend npm dependencies
+   - Location: Docker managed volume
+   - Mounted at: `/app/frontend/node_modules` in app container
+   - Purpose: Preserve npm dependencies when frontend code is mounted as volume
 
 ## Network
 
 **Network Name**: `monkey_network`
 **Driver**: `bridge`
 
-All services communicate through this isolated Docker network. Services can reference each other by service name (e.g., `postgres`, `backend`).
+All services communicate through this isolated Docker network. Services can reference each other by service name (e.g., `postgres`, `app`).
 
 ## Environment Variables
 
@@ -184,14 +209,19 @@ docker-compose -f docker-compose-dev.yml up
 
 ### Accessing Services
 
-- **API**: http://localhost:8000
+- **Backend API**: http://localhost:8000
 - **API Docs**: http://localhost:8000/api/docs
+- **Frontend Dev Server**: http://localhost:5173 (Vite with HMR)
 - **pgAdmin**: http://localhost:8080
 - **PostgreSQL**: localhost:5432
 
+**Note**: Both backend and frontend run in the same container in development mode with hot-reload enabled. Changes to code in VS Code are automatically reflected in both services.
+
 ### Hot Reload
 
-The backend service runs with `--reload` flag, automatically restarting when code changes are detected in the mounted `/app/backend/server` directory.
+Both services support hot-reload:
+- **Backend**: Uvicorn runs with `--reload` flag, automatically restarting when code changes are detected in the mounted `/app/backend/server` directory
+- **Frontend**: Vite dev server provides Hot Module Replacement (HMR), instantly updating the browser when code changes are detected in the mounted `/app/frontend` directory
 
 ### Stopping the Environment
 
@@ -208,13 +238,14 @@ docker-compose -f docker-compose-dev.yml down -v
 
 ```
 illiterate_monkey/
-├── backend/                    # Source code (mounted to container)
+├── backend/                    # Backend source code (mounted to container)
+├── frontend/                   # Frontend source code (mounted to container)
 ├── env/
 │   └── dev.env                # Environment variables (mounted to container)
 └── deploy/
     ├── docker/
-    │   ├── Dockerfile         # Backend container image
-    │   └── entrypoint.sh      # Container startup script
+    │   ├── Dockerfile         # App container image (Python + Node.js)
+    │   └── entrypoint.sh      # Container startup script (runs both services)
     └── compose/
         └── docker-compose-dev.yml  # Service definitions
 ```
@@ -228,8 +259,11 @@ illiterate_monkey/
 
 ## Notes
 
-- The backend container uses Python 3.11 with Poetry for dependency management
-- Hot-reload is enabled for development convenience
+- The app container uses Python 3.11 with Poetry for backend dependencies and Node.js 20.x for frontend dependencies
+- Both backend and frontend run in the same container for development convenience
+- Hot-reload is enabled for both services
+- Frontend dependencies are preserved in a named volume to avoid reinstalling on every container restart
 - All services share the same environment file for consistency
 - Network isolation ensures services can only communicate through defined interfaces
 - Volume mounts allow live code editing without rebuilding containers
+- The entrypoint script manages both processes and handles graceful shutdown
