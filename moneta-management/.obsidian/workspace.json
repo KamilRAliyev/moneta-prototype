@@ -13,12 +13,12 @@
             "state": {
               "type": "markdown",
               "state": {
-                "file": "Architecture/frontend/Frontend Architecture.md",
+                "file": "Notes/Dev Cheat Sheet.md",
                 "mode": "source",
                 "source": false
               },
               "icon": "lucide-file",
-              "title": "Frontend Architecture"
+              "title": "Dev Cheat Sheet"
             }
           }
         ]
@@ -189,23 +189,23 @@
   },
   "active": "f0f8baf9f7c87f59",
   "lastOpenFiles": [
+    "Architecture/backend/Database.md",
+    "Issues/MON-9 — Accounts backend + UI (Vue + Tailwind).md",
     "Architecture/backend/Backend Package Structure.md",
+    "Notes/Feature Implementation Checklist.md",
+    "Architecture/frontend/Testing.md",
+    "Architecture/frontend/README.md",
+    "Architecture/frontend/Frontend Package Structure.md",
+    "Architecture/frontend/Frontend Architecture.md",
+    "Architecture/frontend",
     "Architecture/backend/API Endpoints.md",
     "Issues/MON-8. Frontend Scaffold (Vue3 + Tailwind Baseline).md",
-    "Architecture/frontend/Testing.md",
     "Architecture/DOCUMENTATION_UPDATES.md",
     "Architecture/backend/Testing.md",
     "Architecture/Docker Development Environment.md",
-    "Architecture/frontend/README.md",
-    "Architecture/frontend/Frontend Architecture.md",
-    "Architecture/frontend/Frontend Package Structure.md",
-    "Architecture/frontend",
-    "Notes/Feature Implementation Checklist.md",
     "Architecture/Moneta Code Architecture Document v0.1.md",
     "Architecture/Environment Variables.md",
-    "Architecture/backend/Database.md",
     "Issues/MON-10. Statement files model + upload plumbing.md",
-    "Issues/MON-9 — Accounts UI (Vue + Tailwind).md",
     "Issues/MON-7. API versioning structure.md",
     "Weekly Notes/2025-W52.md",
     "Issues/MON-11. Statements List UI.md",
@@ -215,7 +215,6 @@
     "Issues/MON-2. Alembic migrations baseline.md",
     "Issues/MON-1. Run Moneta locally with one command.md",
     "Architecture/backend/Logging.md",
-    "Issues/MON-3. API versioning structure.md",
     "Notes",
     "Issues",
     "Architecture/backend",

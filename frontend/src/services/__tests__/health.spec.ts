@@ -18,14 +18,15 @@ describe("Health Service", () => {
   });
 
   it("calls getHealth and returns health info", async () => {
-    const mockHealthInfo: HealthInfo = {
-      ok: true,
-      timestamp: "2025-01-01T00:00:00Z",
-      version: "0.1.0",
+    // Mock backend response format
+    const mockBackendResponse = {
+      status: "ok",
+      server_time: "2025-01-01 00:00:00",
+      app_version: "0.1.0",
     };
 
     mockedApiClient.get.mockResolvedValue({
-      data: mockHealthInfo,
+      data: mockBackendResponse,
       status: 200,
       statusText: "OK",
       headers: {},
@@ -35,8 +36,9 @@ describe("Health Service", () => {
     const result = await healthService.getHealth();
 
     expect(mockedApiClient.get).toHaveBeenCalledWith("/health");
-    expect(result).toEqual(mockHealthInfo);
     expect(result.ok).toBe(true);
+    expect(result.timestamp).toBe("2025-01-01 00:00:00");
+    expect(result.version).toBe("0.1.0");
   });
 
   it("handles API errors", async () => {
@@ -48,12 +50,15 @@ describe("Health Service", () => {
   });
 
   it("handles unhealthy status", async () => {
-    const mockHealthInfo: HealthInfo = {
-      ok: false,
+    // Mock backend response with non-ok status
+    const mockBackendResponse = {
+      status: "error",
+      server_time: "2025-01-01 00:00:00",
+      app_version: "0.1.0",
     };
 
     mockedApiClient.get.mockResolvedValue({
-      data: mockHealthInfo,
+      data: mockBackendResponse,
       status: 200,
       statusText: "OK",
       headers: {},

@@ -3,6 +3,7 @@ from contextlib import asynccontextmanager
 
 from fastapi import FastAPI, APIRouter, Request, status
 from fastapi.exceptions import RequestValidationError
+from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 from starlette.exceptions import HTTPException as StarletteHTTPException
 
@@ -10,7 +11,7 @@ from server.core import settings
 from server.core.logging import get_logger, setup_logging
 from server.core.middleware import RequestIDMiddleware
 from server.services import data_dir
-from server.api.routers.v1 import health, system, uploads
+from server.api.routers.v1 import accounts, health, meta, system, uploads
 
 logger = get_logger(__name__)
 
@@ -43,6 +44,20 @@ app = FastAPI(
     docs_url="/api/docs",
     redoc_url="/api/redoc",
     openapi_url="/api/openapi.json",
+)
+
+# Add CORS middleware (allow frontend to connect)
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=[
+        "http://localhost:5173",  # Vite dev server
+        "http://localhost:3000",  # Alternative frontend port
+        "http://127.0.0.1:5173",
+        "http://127.0.0.1:3000",
+    ],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
 )
 
 # Add request ID middleware
@@ -131,4 +146,6 @@ v1_router = APIRouter(prefix="/api/v1", tags=["v1"])
 v1_router.include_router(health.router)
 v1_router.include_router(system.router)
 v1_router.include_router(uploads.router)
+v1_router.include_router(accounts.router)
+v1_router.include_router(meta.router)
 app.include_router(v1_router)

@@ -208,6 +208,38 @@ class Example(Base):
     updated_at = Column(DateTime(timezone=True), onupdate=func.now())
 ```
 
+### Account Model
+
+The `Account` model represents financial accounts in the system.
+
+**Table:** `accounts`
+
+**Fields:**
+- `id` (Integer, Primary Key): Unique identifier
+- `name` (String(255), Required): Account name
+- `institution` (String(255), Required): Financial institution name
+- `currency` (Enum, Required): ISO 4217 currency code (using `iso4217` library)
+- `type` (Enum, Required): Account type (checking, savings, credit_card, cash, investment, loan)
+- `economic_area` (Enum, Optional): Economic region classification (eu, us, uk, cis, mena, apac, china, other)
+- `datelock_from` (Date, Optional): Date lock for ingestion control
+- `created_at` (DateTime, Auto): Record creation timestamp
+- `updated_at` (DateTime, Auto): Record last update timestamp
+
+**Enums:**
+- `AccountType`: checking, savings, credit_card, cash, investment, loan
+- `Currency`: All ISO 4217 currency codes (dynamically generated from `iso4217` library)
+- `EconomicArea`: eu, us, uk, cis, mena, apac, china, other
+
+**Date Lock (`datelock_from`):**
+- Per-account ingestion guardrail
+- Transactions before this date cannot be ingested or reprocessed
+- `null` means no lock (full historical ingestion allowed)
+- Affects future ingestion only (does not delete existing data)
+
+**Model File:** `server/models/account.py`
+
+**Migration:** `60f2323257db_add_accounts_table.py`
+
 ## Migrations (Alembic)
 
 ### Migration Structure

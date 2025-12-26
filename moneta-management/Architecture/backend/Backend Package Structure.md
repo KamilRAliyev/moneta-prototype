@@ -18,6 +18,7 @@ backend/
 │   ├── __init__.py         # Package initialization
 │   ├── models/            # SQLAlchemy database models
 │   │   ├── __init__.py    # Base class for all models
+│   │   ├── account.py      # Account model with enums
 │   │   └── example.py     # Example model (can be deleted)
 │   ├── core/              # Core application components
 │   │   ├── __init__.py    # Package initialization
@@ -29,17 +30,28 @@ backend/
 │   │       ├── database.py # Database configuration settings
 │   │       └── app.py     # Application configuration settings
 │   ├── api/               # API routes
+│   │   ├── schemas/       # Pydantic request/response schemas
+│   │   │   ├── __init__.py
+│   │   │   ├── account.py  # Account API schemas
+│   │   │   ├── health.py   # Health API schemas
+│   │   │   └── system.py   # System API schemas
 │   │   └── routers/       # API route handlers
 │   │       ├── __init__.py # Router exports
 │   │       └── v1/        # Version 1 API routers
 │   │           ├── __init__.py
-│   │           ├── health.py  # Health check endpoints
-│   │           ├── system.py  # System information endpoints
-│   │           └── uploads.py # File upload endpoints
+│   │           ├── accounts.py      # Accounts CRUD endpoints
+│   │           ├── error_handlers.py # Error handling decorator
+│   │           ├── health.py        # Health check endpoints
+│   │           ├── meta.py          # Meta/static data endpoints
+│   │           ├── system.py        # System information endpoints
+│   │           └── uploads.py       # File upload endpoints
 │   ├── services/          # Business logic services
 │   │   ├── __init__.py    # Service exports
+│   │   ├── account.py     # Account business logic service
+│   │   ├── data_dir.py    # Data directory management service
+│   │   ├── exceptions.py  # Custom exception hierarchy
 │   │   ├── health.py      # Health check service
-│   │   └── data_dir.py    # Data directory management service
+│   │   └── meta.py        # Meta/static data service
 │   └── main.py            # FastAPI application entry point
 └── tests/                  # Test suite directory
     └── __init__.py         # Package initialization
@@ -59,6 +71,7 @@ backend/
   - `psycopg[binary]` (>=3.3.2,<4.0.0) - PostgreSQL adapter
   - `python-json-logger` (>=2.0.7,<3.0.0) - JSON logging formatter
   - `python-dotenv` (>=1.0.0,<2.0.0) - Environment variable loading
+  - `iso4217` (>=1.11,<2.0.0) - ISO 4217 currency codes library
 - **Python Version**: >=3.11
 
 #### `poetry.lock`
@@ -170,6 +183,29 @@ Version 1 API routers. All endpoints are prefixed with `/api/v1`.
   - `GET /api/v1/system/info` - System information (version, environment, database status)
   - `GET /api/v1/system/data-dir/test` - Test data directory read/write
 
+##### `server/api/routers/v1/accounts.py`
+- **Purpose**: Accounts CRUD endpoints
+- **Endpoints**:
+  - `GET /api/v1/accounts` - List all accounts (with pagination)
+  - `GET /api/v1/accounts/{id}` - Get account by ID
+  - `POST /api/v1/accounts` - Create new account
+  - `PUT /api/v1/accounts/{id}` - Update account
+  - `DELETE /api/v1/accounts/{id}` - Delete account
+- **Features**:
+  - Uses `AccountService` for business logic
+  - Error handling via `@handle_service_errors` decorator
+  - Pydantic schema validation
+
+##### `server/api/routers/v1/meta.py`
+- **Purpose**: Meta/static data endpoints
+- **Endpoints**:
+  - `GET /api/v1/meta/accounts/options` - Get account types, economic areas, and currencies
+
+##### `server/api/routers/v1/error_handlers.py`
+- **Purpose**: Centralized error handling for API routers
+- **Functions**:
+  - `handle_service_errors` - Decorator to convert service exceptions to HTTP responses
+
 ##### `server/api/routers/v1/uploads.py`
 - **Purpose**: File upload endpoints
 - **Endpoints**:
@@ -178,6 +214,41 @@ Version 1 API routers. All endpoints are prefixed with `/api/v1`.
 ### `server/services/` Module
 
 Business logic and utility services.
+
+#### `server/services/account.py`
+- **Purpose**: Account business logic service
+- **Class**: `AccountService`
+- **Methods**:
+  - `validate_currency()` - Validate currency code
+  - `validate_account_type()` - Validate account type
+  - `validate_economic_area()` - Validate economic area
+  - `get_account()` - Get account by ID
+  - `list_accounts()` - List accounts with pagination
+  - `create_account()` - Create new account
+  - `update_account()` - Update existing account
+  - `delete_account()` - Delete account
+- **Features**:
+  - Database error handling with rollback
+  - Custom exception hierarchy
+  - Enum validation
+
+#### `server/services/meta.py`
+- **Purpose**: Meta/static data service
+- **Class**: `MetaService`
+- **Methods**:
+  - `get_accounts_options()` - Get all static option data for Accounts UI
+
+#### `server/services/exceptions.py`
+- **Purpose**: Custom exception hierarchy for services
+- **Classes**:
+  - `ServiceError` - Base exception class
+  - `NotFoundError` - Resource not found
+  - `ValidationError` - Invalid input data
+  - `DatabaseError` - Database operation errors
+  - `AccountNotFoundError` - Account not found
+  - `InvalidCurrencyError` - Invalid currency code
+  - `InvalidAccountTypeError` - Invalid account type
+  - `InvalidEconomicAreaError` - Invalid economic area
 
 #### `server/services/health.py`
 - **Purpose**: Health check service
@@ -217,12 +288,15 @@ Test suite directory for unit and integration tests.
 
 #### Test Files
 - `conftest.py` - Pytest fixtures and test database setup
+- `test_account_model.py` - Account model tests
+- `test_accounts.py` - Accounts API endpoint tests
 - `test_health.py` - Health endpoint tests
 - `test_database_settings.py` - Database settings tests
 - `test_database_connection.py` - Database connection tests
-- `test_models.py` - Model tests
+- `test_models.py` - Generic model tests
 - `test_alembic.py` - Alembic configuration tests
 - `test_system.py` - System endpoints tests
+- `test_uploads.py` - Upload endpoint tests
 
 For detailed testing documentation, see [Testing.md](./Testing.md).
 
@@ -269,8 +343,11 @@ This is the current structure of the backend package. The following components a
 - ✅ Alembic migrations setup
 - ✅ Models structure with base class
 - ✅ Database session utilities for FastAPI
-- ✅ API routers (health, system, uploads)
-- ✅ Services (health, data directory management)
+- ✅ API routers (health, system, uploads, accounts, meta)
+- ✅ API schemas (Pydantic models for request/response validation)
+- ✅ Services (health, data directory, account, meta)
+- ✅ Error handling (custom exceptions, error handler decorator)
+- ✅ Account model with enums (AccountType, Currency, EconomicArea)
 - ✅ Structured logging with dual output (standard + JSON)
 - ✅ Request ID middleware for log correlation
 - ✅ Error handling with stack traces (dev mode)

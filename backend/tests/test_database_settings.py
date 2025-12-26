@@ -99,9 +99,8 @@ def test_database_url_generation():
     assert "postgres" in url
     assert "moneta" in url
 
-    # Test sync URL
+    # Test sync URL (now uses psycopg dialect for Alembic compatibility)
     sync_url = settings.database_url_sync
-    assert sync_url.startswith("postgresql://")
+    assert sync_url.startswith("postgresql+psycopg://")
     assert "postgres" in sync_url
     assert "moneta" in sync_url
-    assert "+psycopg" not in sync_url

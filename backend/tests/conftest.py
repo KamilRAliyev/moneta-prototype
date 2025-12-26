@@ -7,6 +7,9 @@ from sqlalchemy.pool import StaticPool
 
 from server.models import Base
 
+# Import models so they're registered with Base.metadata
+from server.models.account import Account  # noqa: F401
+
 
 @pytest.fixture(scope="function")
 def test_db():

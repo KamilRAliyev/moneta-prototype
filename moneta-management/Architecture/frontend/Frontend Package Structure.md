@@ -26,6 +26,14 @@ frontend/
     │   └── vue.svg            # Vue logo
     ├── components/            # Reusable Vue components
     │   ├── HelloWorld.vue     # Example component
+    │   ├── accounts/          # Accounts feature components
+    │   │   ├── AccountForm.vue        # Shared form for create/edit
+    │   │   ├── AccountTable.vue       # Accounts table view
+    │   │   ├── DateLockField.vue      # Date lock input with help text
+    │   │   └── __tests__/             # Component tests
+    │   │       ├── AccountForm.spec.ts
+    │   │       ├── AccountTable.spec.ts
+    │   │       └── DateLockField.spec.ts
     │   └── __tests__/         # Component tests
     │       └── HelloWorld.spec.ts
     ├── layouts/               # Layout components
@@ -34,19 +42,35 @@ frontend/
     │       └── AppShell.spec.ts
     ├── views/                 # Route-level page components
     │   ├── Home.vue           # Home page view
+    │   ├── accounts/          # Accounts feature views
+    │   │   ├── AccountsList.vue      # Accounts list page
+    │   │   ├── AccountCreate.vue     # Create account page
+    │   │   ├── AccountDetail.vue     # Account detail/edit page
+    │   │   └── __tests__/             # View tests
+    │   │       ├── AccountsList.spec.ts
+    │   │       ├── AccountCreate.spec.ts
+    │   │       └── AccountDetail.spec.ts
     │   └── __tests__/         # View tests
     │       └── Home.spec.ts
     ├── router/                # Vue Router configuration
     │   └── index.ts           # Router setup and route definitions
     ├── services/              # API service layer
     │   ├── api.ts             # Axios API client wrapper
+    │   ├── accounts.ts        # Accounts CRUD service
     │   ├── health.ts          # Health check service
     │   ├── system.ts          # System information service
     │   ├── index.ts           # Service exports (barrel file)
     │   └── __tests__/         # Service tests
+    │       ├── accounts.spec.ts
     │       ├── api.spec.ts
     │       ├── health.spec.ts
     │       └── system.spec.ts
+    ├── types/                 # TypeScript type definitions
+    │   └── accounts.ts        # Account DTOs and types
+    ├── composables/           # Vue composables (reusable logic)
+    │   ├── useAccountMeta.ts  # Meta options caching composable
+    │   └── __tests__/         # Composable tests
+    │       └── useAccountMeta.spec.ts
     ├── stores/                # Pinia state management stores
     │   ├── index.ts           # Store exports (barrel file)
     │   ├── app.ts             # Example app store
@@ -174,6 +198,45 @@ Reusable Vue components used across the application.
 - Example component demonstrating component structure
 - Can be removed or repurposed
 
+#### `src/components/accounts/` Module
+- **AccountForm.vue**: Shared form component for creating and editing accounts
+  - Handles form validation
+  - Populates dropdowns from meta options
+  - Supports both create and edit modes
+- **AccountTable.vue**: Table component for displaying accounts list
+  - Shows all account fields
+  - Handles row clicks and action buttons
+  - Formats date lock display
+- **DateLockField.vue**: Specialized date input component
+  - Date picker with clear button
+  - Help text explaining date lock behavior
+  - Error display support
+
+### `src/types/` Module
+
+TypeScript type definitions matching backend DTOs.
+
+#### `src/types/accounts.ts`
+- **Account**: Account response type
+- **AccountCreateRequest**: Account creation payload
+- **AccountUpdateRequest**: Account update payload
+- **MetaOptionsResponse**: Meta options response (account types, economic areas, currencies)
+- **AccountTypeOption**, **EconomicAreaOption**, **CurrencyOption**: Option types
+
+### `src/composables/` Module
+
+Vue composables for reusable logic.
+
+#### `src/composables/useAccountMeta.ts`
+- **Purpose**: Fetch and cache account meta options
+- **Features**:
+  - In-memory caching after first fetch
+  - Loading and error state management
+  - Cache clearing utility
+- **Methods**:
+  - `fetchMeta()`: Fetch meta options (uses cache if available)
+  - `clearCache()`: Clear cached meta options
+
 ### `src/views/` Module
 
 Route-level page components. Each route typically has a corresponding view component.
@@ -181,6 +244,20 @@ Route-level page components. Each route typically has a corresponding view compo
 #### `src/views/Home.vue`
 - Home page view component
 - Currently contains example content from the original App.vue
+
+#### `src/views/accounts/` Module
+- **AccountsList.vue**: Accounts list page (`/accounts`)
+  - Displays accounts in table
+  - Create account button
+  - Delete confirmation modal
+  - Error handling
+- **AccountCreate.vue**: Create account page (`/accounts/new`)
+  - Uses AccountForm component
+  - Navigates to account detail after creation
+- **AccountDetail.vue**: Account detail/edit page (`/accounts/:id`)
+  - Uses AccountForm component in edit mode
+  - Loads account data on mount
+  - Handles updates and navigation
 
 ### `src/router/` Module
 
@@ -194,6 +271,9 @@ Vue Router configuration and route definitions.
   - Exports router for use in `main.ts`
 - **Current Routes**:
   - `/` - Home page (renders `Home.vue`)
+  - `/accounts` - Accounts list page (renders `AccountsList.vue`)
+  - `/accounts/new` - Create account page (renders `AccountCreate.vue`)
+  - `/accounts/:id` - Account detail/edit page (renders `AccountDetail.vue`)
 
 ### `src/stores/` Module
 
@@ -438,6 +518,16 @@ API service layer for backend communication.
 - **Methods**:
   - `getHealth()`: Get health status from backend
 
+#### `src/services/accounts.ts`
+- **Purpose**: Accounts CRUD service
+- **Methods**:
+  - `listAccounts(skip, limit)`: List accounts with pagination
+  - `getAccount(id)`: Get account by ID
+  - `createAccount(payload)`: Create new account
+  - `updateAccount(id, payload)`: Update existing account
+  - `deleteAccount(id)`: Delete account
+  - `getAccountMetaOptions()`: Get meta options (account types, economic areas, currencies)
+
 #### `src/services/system.ts`
 - **Purpose**: System information service
 - **Methods**:
@@ -450,6 +540,7 @@ API service layer for backend communication.
 #### `src/services/__tests__/`
 - **Purpose**: Service unit tests
 - **Tests**: API client configuration, service methods, error handling
+  - `accounts.spec.ts`: Accounts service tests (CRUD operations, meta options)
 
 ## Future Expansion Areas
 
@@ -457,12 +548,22 @@ The following areas are ready for expansion:
 
 - Additional routes and views
 - More Pinia stores for different domains
-- Additional API services (uploads, accounts, etc.)
+- Additional API services (uploads, etc.)
 - Component library expansion
-- Form validation
-- Error handling and loading states
 - Authentication/authorization
 - Path aliases configuration
 - Environment variable configuration
 - API endpoint constants
 - Additional test utilities and helpers
+
+## Accounts Feature
+
+The Accounts feature is fully implemented with:
+
+- ✅ **Types** (`src/types/accounts.ts`): TypeScript interfaces for all Account DTOs
+- ✅ **Service** (`src/services/accounts.ts`): CRUD operations and meta options
+- ✅ **Composable** (`src/composables/useAccountMeta.ts`): Meta options caching
+- ✅ **Views**: AccountsList, AccountCreate, AccountDetail
+- ✅ **Components**: AccountForm, AccountTable, DateLockField
+- ✅ **Routes**: `/accounts`, `/accounts/new`, `/accounts/:id`
+- ✅ **Tests**: Comprehensive test coverage (84 tests passing)

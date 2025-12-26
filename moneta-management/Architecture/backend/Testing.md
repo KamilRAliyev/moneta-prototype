@@ -4,12 +4,15 @@ This document describes the test suite for the backend application.
 
 ## Test Files
 
+- `test_account_model.py` - Account model tests (enums, timestamps, queries)
+- `test_accounts.py` - Accounts API endpoint tests (CRUD operations, validation, error handling)
 - `test_health.py` - Health check endpoint tests
 - `test_database_settings.py` - Database configuration settings tests
 - `test_database_connection.py` - Database connection and session management tests
-- `test_models.py` - Database models tests
+- `test_models.py` - Generic database models tests
 - `test_alembic.py` - Alembic migrations configuration tests
 - `test_system.py` - System information endpoints tests
+- `test_uploads.py` - File upload endpoint tests
 - `conftest.py` - Pytest fixtures and configuration
 
 ## Running Tests
@@ -56,17 +59,46 @@ The test suite covers:
 ✅ Migration folder structure
 ✅ System information endpoints
 ✅ Data directory management
+✅ Account model (creation, enums, timestamps, queries)
+✅ Accounts API endpoints (CRUD operations, pagination, validation)
+✅ Account service layer (business logic, error handling)
+✅ Meta options endpoint
+✅ Error handling and exception mapping
 
 ## Test Structure
 
 ```
 tests/
 ├── __init__.py
-├── conftest.py              # Pytest fixtures
+├── conftest.py              # Pytest fixtures (test database setup)
+├── test_account_model.py    # Account model tests
+├── test_accounts.py         # Accounts API endpoint tests
 ├── test_health.py           # Health endpoint tests
 ├── test_database_settings.py # Database settings tests
 ├── test_database_connection.py # Database connection tests
-├── test_models.py           # Model tests
+├── test_models.py           # Generic model tests
 ├── test_alembic.py          # Alembic configuration tests
-└── test_system.py           # System endpoints tests
+├── test_system.py           # System endpoints tests
+└── test_uploads.py          # Upload endpoint tests
 ```
+
+## Account Model Tests
+
+`test_account_model.py` covers:
+- Model creation with required and optional fields
+- Automatic timestamp handling (created_at, updated_at)
+- Enum validations (AccountType, EconomicArea, Currency)
+- Currency enum helper methods (name_full, exponent)
+- Database queries and filtering
+
+## Accounts API Tests
+
+`test_accounts.py` covers:
+- List accounts (empty, with data, pagination)
+- Get account by ID (success and not found)
+- Create account (success, minimal fields, invalid data)
+- Update account (full and partial updates)
+- Delete account (success and not found)
+- Meta options endpoint
+- Error handling and validation
+- Database session patching for test isolation

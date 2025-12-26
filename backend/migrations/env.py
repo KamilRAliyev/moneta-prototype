@@ -18,6 +18,8 @@ from server.models import Base
 
 # Import all models here so Alembic can detect them
 # Add your model imports here as you create them
+from server.models.account import Account  # noqa: E402, F401
+
 # from server.models.user import User
 # from server.models.product import Product
 

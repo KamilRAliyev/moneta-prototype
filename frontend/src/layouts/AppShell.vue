@@ -5,7 +5,7 @@ const route = useRoute();
 </script>
 
 <template>
-  <div class="min-h-screen bg-gray-50 dark:bg-gray-900">
+  <div class="min-h-screen bg-white dark:bg-gray-900">
     <!-- Header -->
     <header class="bg-white dark:bg-gray-800 shadow">
       <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -33,14 +33,24 @@ const route = useRoute();
             >
               Home
             </RouterLink>
-            <!-- Add more navigation links here as needed -->
+            <RouterLink
+              to="/accounts"
+              class="px-3 py-2 rounded-md text-sm font-medium transition-colors"
+              :class="
+                route.path.startsWith('/accounts')
+                  ? 'bg-gray-900 text-white dark:bg-gray-700'
+                  : 'text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-700'
+              "
+            >
+              Accounts
+            </RouterLink>
           </nav>
         </div>
       </div>
     </header>
 
     <!-- Main Content -->
-    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <main class="w-full px-4 sm:px-6 lg:px-8 py-8">
       <router-view />
     </main>
 
