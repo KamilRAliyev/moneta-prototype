@@ -21,6 +21,9 @@ COPY backend /app/backend/
 WORKDIR /app/backend
 RUN poetry install --no-interaction --no-ansi
 
+# Fix dateinfer package broken imports (known issue with dateinfer 0.1.1)
+RUN if [ -f scripts/fix_dateinfer.py ]; then python scripts/fix_dateinfer.py; fi
+
 # Copy and install frontend dependencies
 WORKDIR /app
 COPY frontend /app/frontend/

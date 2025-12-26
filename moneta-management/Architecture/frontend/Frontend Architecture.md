@@ -26,23 +26,26 @@ flowchart TB
 
         subgraph Views["Views Layer"]
             Home[Home.vue]
-            OtherViews[Other Views...]
+            AccountsViews[Accounts Views<br/>✅ Implemented]
+            StatementsViews[Statements Views<br/>✅ Implemented]
         end
 
         subgraph Components["Components Layer"]
-            ReusableComponents[Reusable Components<br/>HelloWorld.vue<br/>etc.]
+            AccountsComponents[Accounts Components<br/>✅ Implemented]
+            StatementsComponents[Statements Components<br/>✅ Implemented]
         end
 
         subgraph State["State Management"]
             AppStore[App Store<br/>Pinia Store]
-            FeatureStores[Feature Stores<br/>Future stores...]
+            StatementsStore[Statements Store<br/>✅ Implemented]
         end
 
         subgraph Services["API Services Layer"]
             APIClient[API Client<br/>Axios Wrapper<br/>✅ Implemented]
             HealthService[Health Service<br/>✅ Implemented]
             SystemService[System Service<br/>✅ Implemented]
-            UploadService[Upload Service<br/>Future]
+            AccountsService[Accounts Service<br/>✅ Implemented]
+            StatementsService[Statements Service<br/>✅ Implemented]
         end
 
         subgraph Layouts["Layout Layer"]
@@ -325,8 +328,9 @@ src/
     api.ts            # Axios client wrapper with interceptors
     health.ts         # Health API service ✅
     system.ts         # System API service ✅
+    accounts.ts       # Accounts API service ✅
+    statements.ts     # Statements API service ✅
     index.ts          # Service barrel export
-    uploads.ts        # Uploads API service (future)
 ```
 
 ### API Client Pattern

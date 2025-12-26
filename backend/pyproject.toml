@@ -18,7 +18,9 @@ dependencies = [
     "python-dotenv (>=1.0.0,<2.0.0)",
     "python-json-logger (>=2.0.7,<3.0.0)",
     "python-multipart (>=0.0.21,<0.0.22)",
-    "iso4217 (>=1.11,<2.0.0)"
+    "iso4217 (>=1.11,<2.0.0)",
+    "dateinfer (>=0.1.1,<0.2.0)",
+    "python-dateutil (>=2.9.0,<3.0.0)"
 ]
 
 

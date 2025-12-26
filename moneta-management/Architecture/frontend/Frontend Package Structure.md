@@ -34,6 +34,12 @@ frontend/
     │   │       ├── AccountForm.spec.ts
     │   │       ├── AccountTable.spec.ts
     │   │       └── DateLockField.spec.ts
+    │   ├── statements/        # Statements feature components
+    │   │   ├── StatementUpload.vue    # File upload component with drag & drop
+    │   │   ├── StatementTable.vue     # Statements table view
+    │   │   └── __tests__/             # Component tests
+    │   │       ├── StatementUpload.spec.ts
+    │   │       └── StatementTable.spec.ts
     │   └── __tests__/         # Component tests
     │       └── HelloWorld.spec.ts
     ├── layouts/               # Layout components
@@ -50,6 +56,10 @@ frontend/
     │   │       ├── AccountsList.spec.ts
     │   │       ├── AccountCreate.spec.ts
     │   │       └── AccountDetail.spec.ts
+    │   ├── statements/        # Statements feature views
+    │   │   ├── Statements.vue        # Statements page (upload + list)
+    │   │   └── __tests__/             # View tests
+    │   │       └── Statements.spec.ts
     │   └── __tests__/         # View tests
     │       └── Home.spec.ts
     ├── router/                # Vue Router configuration
@@ -58,15 +68,18 @@ frontend/
     │   ├── api.ts             # Axios API client wrapper
     │   ├── accounts.ts        # Accounts CRUD service
     │   ├── health.ts          # Health check service
+    │   ├── statements.ts      # Statements CRUD service
     │   ├── system.ts          # System information service
     │   ├── index.ts           # Service exports (barrel file)
     │   └── __tests__/         # Service tests
     │       ├── accounts.spec.ts
     │       ├── api.spec.ts
     │       ├── health.spec.ts
+    │       ├── statements.spec.ts
     │       └── system.spec.ts
     ├── types/                 # TypeScript type definitions
-    │   └── accounts.ts        # Account DTOs and types
+    │   ├── accounts.ts        # Account DTOs and types
+    │   └── statements.ts      # Statement DTOs and types
     ├── composables/           # Vue composables (reusable logic)
     │   ├── useAccountMeta.ts  # Meta options caching composable
     │   └── __tests__/         # Composable tests
@@ -74,6 +87,7 @@ frontend/
     ├── stores/                # Pinia state management stores
     │   ├── index.ts           # Store exports (barrel file)
     │   ├── app.ts             # Example app store
+    │   ├── statements.ts      # Statements state management store
     │   └── __tests__/         # Store tests
     │       └── app.spec.ts
     └── test/                  # Test utilities and setup
@@ -212,6 +226,19 @@ Reusable Vue components used across the application.
   - Help text explaining date lock behavior
   - Error display support
 
+#### `src/components/statements/` Module
+- **StatementUpload.vue**: File upload component with drag & drop support
+  - Account selection dropdown
+  - CSV file validation (type and size)
+  - Drag & drop file upload area
+  - Visual feedback for file selection
+  - Error handling and loading states
+- **StatementTable.vue**: Table component for displaying statements list
+  - Shows all statement fields (uploaded at, filename, account, size, rows, date range, status, ingested, file existence)
+  - Status badges (uploaded, ingested/not ingested, file exists/missing)
+  - Delete action with confirmation
+  - Formats file size, dates, and row counts
+
 ### `src/types/` Module
 
 TypeScript type definitions matching backend DTOs.
@@ -222,6 +249,14 @@ TypeScript type definitions matching backend DTOs.
 - **AccountUpdateRequest**: Account update payload
 - **MetaOptionsResponse**: Meta options response (account types, economic areas, currencies)
 - **AccountTypeOption**, **EconomicAreaOption**, **CurrencyOption**: Option types
+
+#### `src/types/statements.ts`
+- **StatementFile**: Full statement file response type
+- **StatementFileSummary**: Abbreviated statement file for list views
+- **DuplicateStatementFileResponse**: Duplicate file error response
+- **DateFormatInferenceResponse**: Date format inference result
+- **SupportedDateFormatsResponse**: Supported date formats list
+- **DetectedFormat**, **DateFormatOption**: Format-related types
 
 ### `src/composables/` Module
 
@@ -259,6 +294,14 @@ Route-level page components. Each route typically has a corresponding view compo
   - Loads account data on mount
   - Handles updates and navigation
 
+#### `src/views/statements/` Module
+- **Statements.vue**: Statements page (`/statements`)
+  - Upload section with StatementUpload component
+  - Statements table with StatementTable component
+  - Delete confirmation modal
+  - Error handling and loading states
+  - Uses statements store for state management
+
 ### `src/router/` Module
 
 Vue Router configuration and route definitions.
@@ -274,6 +317,7 @@ Vue Router configuration and route definitions.
   - `/accounts` - Accounts list page (renders `AccountsList.vue`)
   - `/accounts/new` - Create account page (renders `AccountCreate.vue`)
   - `/accounts/:id` - Account detail/edit page (renders `AccountDetail.vue`)
+  - `/statements` - Statements page (renders `Statements.vue`)
 
 ### `src/stores/` Module
 
@@ -295,6 +339,24 @@ Pinia state management stores using Composition API style.
   - `decrement()`: Decrement counter
   - `reset()`: Reset counter to 0
   - `setName(newName: string)`: Update application name
+
+#### `src/stores/statements.ts`
+- **Purpose**: Statements state management store
+- **State**:
+  - `statements`: Array of statement file summaries
+  - `isLoading`: Loading state (boolean)
+  - `error`: Error message (string | null)
+  - `selectedAccountId`: Currently selected account ID for filtering (number | undefined)
+- **Getters**:
+  - `statementsByAccount`: Filtered statements by selected account
+  - `hasStatements`: Whether any statements exist
+- **Actions**:
+  - `loadStatements(accountId?, skip?, limit?)`: Load statements from API
+  - `uploadStatement(file, accountId)`: Upload a statement file
+  - `deleteStatement(id)`: Delete a statement file
+  - `setSelectedAccount(accountId)`: Set account filter
+  - `clearError()`: Clear error state
+  - `reset()`: Reset store to initial state
 
 #### `src/stores/__tests__/app.spec.ts`
 - **Purpose**: Unit tests for the app store
@@ -527,6 +589,16 @@ API service layer for backend communication.
   - `updateAccount(id, payload)`: Update existing account
   - `deleteAccount(id)`: Delete account
   - `getAccountMetaOptions()`: Get meta options (account types, economic areas, currencies)
+
+#### `src/services/statements.ts`
+- **Purpose**: Statements CRUD service
+- **Methods**:
+  - `uploadStatement(file, accountId)`: Upload CSV statement file
+  - `listStatements(accountId?, skip?, limit?)`: List statements with optional filtering and pagination
+  - `getStatement(id)`: Get statement file by ID
+  - `deleteStatement(id)`: Delete statement file
+  - `inferDateFormat(file)`: Infer date format from CSV file
+  - `getSupportedDateFormats()`: Get list of supported date formats
 
 #### `src/services/system.ts`
 - **Purpose**: System information service

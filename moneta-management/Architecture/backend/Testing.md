@@ -11,6 +11,8 @@ This document describes the test suite for the backend application.
 - `test_database_connection.py` - Database connection and session management tests
 - `test_models.py` - Generic database models tests
 - `test_alembic.py` - Alembic migrations configuration tests
+- `test_statement_model.py` - Statement file model tests (enums, timestamps, foreign keys, constraints)
+- `test_statements.py` - Statement file API endpoint tests (upload, list, get, delete, meta endpoints)
 - `test_system.py` - System information endpoints tests
 - `test_uploads.py` - File upload endpoint tests
 - `conftest.py` - Pytest fixtures and configuration
@@ -62,7 +64,11 @@ The test suite covers:
 ✅ Account model (creation, enums, timestamps, queries)
 ✅ Accounts API endpoints (CRUD operations, pagination, validation)
 ✅ Account service layer (business logic, error handling)
+✅ Statement file model (creation, enums, timestamps, foreign keys, unique constraints)
+✅ Statement file API endpoints (upload, list, get, delete, duplicate detection)
+✅ Statement file service layer (business logic, CSV metadata extraction, date format inference)
 ✅ Meta options endpoint
+✅ Meta date format inference endpoints
 ✅ Error handling and exception mapping
 
 ## Test Structure
@@ -78,6 +84,8 @@ tests/
 ├── test_database_connection.py # Database connection tests
 ├── test_models.py           # Generic model tests
 ├── test_alembic.py          # Alembic configuration tests
+├── test_statement_model.py  # Statement file model tests
+├── test_statements.py       # Statement file API endpoint tests
 ├── test_system.py           # System endpoints tests
 └── test_uploads.py          # Upload endpoint tests
 ```
@@ -102,3 +110,27 @@ tests/
 - Meta options endpoint
 - Error handling and validation
 - Database session patching for test isolation
+
+## Statement File Model Tests
+
+`test_statement_model.py` covers:
+- Model creation with required and optional fields
+- Automatic timestamp handling (created_at, updated_at)
+- Enum validations (StatementFormat, StatementStatus)
+- Foreign key relationship with accounts (CASCADE delete)
+- Unique constraint on (account_id, content_hash)
+- Database queries and filtering
+
+## Statement File API Tests
+
+`test_statements.py` covers:
+- Upload statement (success, invalid account, duplicate, invalid file type, empty file)
+- List statements (empty, with data, filter by account, pagination)
+- Get statement by ID (success and not found)
+- Delete statement (success and not found)
+- Meta date format inference endpoint
+- Meta supported date formats endpoint
+- CSV metadata extraction (row count, columns, date range)
+- Duplicate detection (same account + content hash)
+- Error handling and validation
+- File storage and atomic operations

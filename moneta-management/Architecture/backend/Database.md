@@ -240,6 +240,61 @@ The `Account` model represents financial accounts in the system.
 
 **Migration:** `60f2323257db_add_accounts_table.py`
 
+### StatementFile Model
+
+The `StatementFile` model represents uploaded CSV statement files associated with accounts.
+
+**Table:** `statement_files`
+
+**Fields:**
+- `id` (UUID, Primary Key): Unique identifier (UUID v4)
+- `account_id` (Integer, Foreign Key → accounts.id, Required): Account this statement belongs to
+- `original_filename` (String(255), Required): Original uploaded filename
+- `stored_filename` (String(255), Required): Renamed filename (`{uuid}.csv`)
+- `stored_path` (String(512), Required): Full path: `/data/statements/{uuid}.csv`
+- `format` (Enum, Required): File format: `csv` (v1 only, extensible for future formats)
+- `size_bytes` (Integer, Required): File size in bytes
+- `content_hash` (String(64), Required): SHA-256 hash (hex string, 64 chars) for duplicate detection
+- `row_count` (Integer, Required): Number of data rows (excluding header)
+- `columns` (JSON, Optional): CSV header column names as JSON array (nullable if parsing fails)
+- `date_from` (Date, Optional): Inferred earliest transaction date (nullable)
+- `date_to` (Date, Optional): Inferred latest transaction date (nullable)
+- `status` (Enum, Required): Current status: `uploaded` (v1 only, extensible)
+- `is_ingested` (Boolean, Required, Default: false): Whether transactions have been ingested
+- `ingested_at` (DateTime(timezone=True), Optional): Timestamp when ingestion completed (nullable)
+- `created_at` (DateTime(timezone=True), Auto): Record creation timestamp
+- `updated_at` (DateTime(timezone=True), Auto): Record last update timestamp
+
+**Enums:**
+- `StatementFormat`: csv
+- `StatementStatus`: uploaded
+
+**Constraints:**
+- Unique constraint: `(account_id, content_hash)` - prevents duplicate uploads per account
+- Index: `(account_id, created_at DESC)` - optimize list queries by account
+- Foreign key: `account_id` → `accounts.id` (CASCADE on delete)
+
+**Duplicate Detection:**
+- Content-based deduplication using SHA-256 hash
+- Same file can be uploaded to different accounts (different `account_id`)
+- Duplicate uploads to the same account return `409 Conflict` with existing statement details
+
+**CSV Metadata Extraction:**
+- Row count: Counts data rows (excluding header)
+- Columns: Extracts header row as JSON array
+- Date range: Infers date column and extracts earliest/latest dates using `dateinfer` library with fallback to `dateutil.parser`
+- Metadata extraction failures are non-fatal (nullable fields)
+
+**File Storage:**
+- Files stored at `/data/statements/{uuid}.csv`
+- Atomic operation: File write + DB insert must succeed or fail together
+- On DB failure, file is deleted (rollback)
+- On file write failure, no DB record is created
+
+**Model File:** `server/models/statement_file.py`
+
+**Migration:** `0a1430f21d66_add_statement_files_table.py`
+
 ## Migrations (Alembic)
 
 ### Migration Structure

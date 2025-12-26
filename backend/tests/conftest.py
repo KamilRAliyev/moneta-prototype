@@ -9,6 +9,7 @@ from server.models import Base
 
 # Import models so they're registered with Base.metadata
 from server.models.account import Account  # noqa: F401
+from server.models.statement_file import StatementFile  # noqa: F401
 
 
 @pytest.fixture(scope="function")
@@ -20,6 +21,16 @@ def test_db():
         connect_args={"check_same_thread": False},
         poolclass=StaticPool,
     )
+
+    # Enable foreign key constraints in SQLite
+    from sqlalchemy import event
+
+    @event.listens_for(test_engine, "connect")
+    def set_sqlite_pragma(dbapi_conn, connection_record):
+        cursor = dbapi_conn.cursor()
+        cursor.execute("PRAGMA foreign_keys=ON")
+        cursor.close()
+
     Base.metadata.create_all(bind=test_engine)
 
     TestSessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=test_engine)

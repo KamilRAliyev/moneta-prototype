@@ -4,6 +4,7 @@ import Home from "../views/Home.vue";
 import AccountsList from "../views/accounts/AccountsList.vue";
 import AccountCreate from "../views/accounts/AccountCreate.vue";
 import AccountDetail from "../views/accounts/AccountDetail.vue";
+import Statements from "../views/statements/Statements.vue";
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -31,6 +32,11 @@ const router = createRouter({
           path: "accounts/:id",
           name: "account-detail",
           component: AccountDetail,
+        },
+        {
+          path: "statements",
+          name: "statements",
+          component: Statements,
         },
       ],
     },

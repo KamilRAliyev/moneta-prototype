@@ -32,14 +32,20 @@ Vitest and Vue Test Utils are fully configured and working for testing Vue compo
   - `AccountForm.spec.ts` - Form component tests (validation, submit, edit mode)
   - `AccountTable.spec.ts` - Table component tests (display, actions, formatting)
   - `DateLockField.spec.ts` - Date lock field tests (date input, clear button, errors)
+- `src/components/statements/__tests__/` - Statements component tests
+  - `StatementUpload.spec.ts` - Upload component tests (drag & drop, validation, file selection)
+  - `StatementTable.spec.ts` - Table component tests (display, formatting, file existence)
 - `src/stores/__tests__/app.spec.ts` - Pinia store test example
 - `src/App.vue.spec.ts` - App component test example
 - `src/services/__tests__/accounts.spec.ts` - Accounts service tests (CRUD, meta options)
+- `src/services/__tests__/statements.spec.ts` - Statements service tests (upload, list, delete, meta)
 - `src/composables/__tests__/useAccountMeta.spec.ts` - Meta caching composable tests
 - `src/views/accounts/__tests__/` - Accounts view tests
   - `AccountsList.spec.ts` - List page tests (loading, error handling, delete)
   - `AccountCreate.spec.ts` - Create page tests (form submission, navigation)
   - `AccountDetail.spec.ts` - Detail page tests (loading, error handling, update)
+- `src/views/statements/__tests__/` - Statements view tests
+  - `Statements.spec.ts` - Statements page tests (upload, list, delete, error handling)
 
 ### 4. TypeScript Configuration
 - `tsconfig.app.json` includes `vitest/globals` types
@@ -131,7 +137,7 @@ The test suite currently covers:
 ✅ Router navigation
 ✅ Pinia store functionality
 
-**Current Status**: 84 tests passing (including Accounts feature tests)
+**Current Status**: 119 tests passing (including Accounts and Statements feature tests)
 
 ## Pre-commit Integration
 

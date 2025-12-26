@@ -19,6 +19,7 @@ backend/
 │   ├── models/            # SQLAlchemy database models
 │   │   ├── __init__.py    # Base class for all models
 │   │   ├── account.py      # Account model with enums
+│   │   ├── statement_file.py # Statement file model
 │   │   └── example.py     # Example model (can be deleted)
 │   ├── core/              # Core application components
 │   │   ├── __init__.py    # Package initialization
@@ -34,6 +35,7 @@ backend/
 │   │   │   ├── __init__.py
 │   │   │   ├── account.py  # Account API schemas
 │   │   │   ├── health.py   # Health API schemas
+│   │   │   ├── statement_file.py # Statement file API schemas
 │   │   │   └── system.py   # System API schemas
 │   │   └── routers/       # API route handlers
 │   │       ├── __init__.py # Router exports
@@ -43,6 +45,7 @@ backend/
 │   │           ├── error_handlers.py # Error handling decorator
 │   │           ├── health.py        # Health check endpoints
 │   │           ├── meta.py          # Meta/static data endpoints
+│   │           ├── statements.py   # Statement file endpoints
 │   │           ├── system.py        # System information endpoints
 │   │           └── uploads.py       # File upload endpoints
 │   ├── services/          # Business logic services
@@ -51,7 +54,8 @@ backend/
 │   │   ├── data_dir.py    # Data directory management service
 │   │   ├── exceptions.py  # Custom exception hierarchy
 │   │   ├── health.py      # Health check service
-│   │   └── meta.py        # Meta/static data service
+│   │   ├── meta.py        # Meta/static data service
+│   │   └── statement_file.py # Statement file business logic service
 │   └── main.py            # FastAPI application entry point
 └── tests/                  # Test suite directory
     └── __init__.py         # Package initialization
@@ -99,6 +103,13 @@ SQLAlchemy database models module.
 - **Purpose**: Base class for all database models
 - **Class**: `Base` (extends `DeclarativeBase`)
 - All models should inherit from this base class
+
+#### `server/models/statement_file.py`
+- Statement file model representing uploaded CSV statements
+- Fields: id (UUID), account_id (FK), original_filename, stored_filename, stored_path, format, size_bytes, content_hash, row_count, columns (JSON), date_from, date_to, status, is_ingested, ingested_at, timestamps
+- Enums: StatementFormat (csv), StatementStatus (uploaded)
+- Unique constraint: (account_id, content_hash) for duplicate detection
+- Foreign key with CASCADE delete to accounts table
 
 #### `server/models/example.py`
 - Example model demonstrating the structure (can be deleted)
@@ -200,6 +211,22 @@ Version 1 API routers. All endpoints are prefixed with `/api/v1`.
 - **Purpose**: Meta/static data endpoints
 - **Endpoints**:
   - `GET /api/v1/meta/accounts/options` - Get account types, economic areas, and currencies
+  - `POST /api/v1/meta/statements/infer-date-format` - Infer date format from CSV file
+  - `GET /api/v1/meta/statements/date-formats` - Get list of supported date formats
+
+##### `server/api/routers/v1/statements.py`
+- **Purpose**: Statement file CRUD endpoints
+- **Endpoints**:
+  - `POST /api/v1/statements` - Upload CSV statement file for an account
+  - `GET /api/v1/statements` - List statement files (with optional account_id filter and pagination)
+  - `GET /api/v1/statements/{id}` - Get statement file by ID
+  - `DELETE /api/v1/statements/{id}` - Delete statement file and associated file on disk
+- **Features**:
+  - Uses `StatementFileService` for business logic
+  - Error handling via `@handle_service_errors` decorator
+  - Duplicate detection (409 Conflict for same account + content hash)
+  - CSV metadata extraction (row count, columns, date range)
+  - Atomic file write + DB insert operations
 
 ##### `server/api/routers/v1/error_handlers.py`
 - **Purpose**: Centralized error handling for API routers
@@ -249,6 +276,8 @@ Business logic and utility services.
   - `InvalidCurrencyError` - Invalid currency code
   - `InvalidAccountTypeError` - Invalid account type
   - `InvalidEconomicAreaError` - Invalid economic area
+  - `StatementFileNotFoundError` - Statement file not found
+  - `DuplicateStatementFileError` - Duplicate statement file (same account + content hash)
 
 #### `server/services/health.py`
 - **Purpose**: Health check service
@@ -260,7 +289,26 @@ Business logic and utility services.
 - **Functions**:
   - `ensure_data_dir()` - Creates and verifies data directory is writable
   - `ensure_uploads_dir()` - Creates and verifies uploads subdirectory is writable
+  - `ensure_statements_dir()` - Creates and verifies statements subdirectory is writable
   - `test_data_dir_write()` - Tests read/write capabilities
+
+#### `server/services/statement_file.py`
+- **Purpose**: Statement file business logic service
+- **Class**: `StatementFileService`
+- **Methods**:
+  - `create_statement_file()` - Upload and create statement file record (atomic file write + DB insert)
+  - `get_statement_file()` - Get statement file by ID
+  - `list_statement_files()` - List statement files with optional account_id filter and pagination
+  - `delete_statement_file()` - Delete statement file and associated file on disk (atomic)
+  - `_compute_content_hash()` - Compute SHA-256 hash for duplicate detection
+  - `_check_duplicate()` - Check for duplicate statement file (account_id + content_hash)
+  - `_extract_csv_metadata()` - Extract CSV metadata (row count, columns, date range)
+- **Features**:
+  - Atomic operations (file write + DB insert succeed or fail together)
+  - Duplicate detection based on account_id + content_hash
+  - CSV metadata extraction using `dateinfer` library with fallback to `dateutil.parser`
+  - Date format inference for date columns
+  - Custom exceptions: `StatementFileNotFoundError`, `DuplicateStatementFileError`
 
 ### `migrations/` Directory
 
@@ -295,6 +343,8 @@ Test suite directory for unit and integration tests.
 - `test_database_connection.py` - Database connection tests
 - `test_models.py` - Generic model tests
 - `test_alembic.py` - Alembic configuration tests
+- `test_statement_model.py` - Statement file model tests
+- `test_statements.py` - Statement file API endpoint tests
 - `test_system.py` - System endpoints tests
 - `test_uploads.py` - Upload endpoint tests
 
@@ -307,6 +357,7 @@ For detailed testing documentation, see [Testing.md](./Testing.md).
 - **Database Migrations**: Alembic
 - **Dependency Management**: Poetry
 - **Database**: PostgreSQL (via psycopg)
+- **Date Parsing**: `dateinfer` (format inference), `python-dateutil` (flexible parsing)
 
 ## Environment Variables
 
@@ -343,11 +394,14 @@ This is the current structure of the backend package. The following components a
 - ✅ Alembic migrations setup
 - ✅ Models structure with base class
 - ✅ Database session utilities for FastAPI
-- ✅ API routers (health, system, uploads, accounts, meta)
+- ✅ API routers (health, system, uploads, accounts, statements, meta)
 - ✅ API schemas (Pydantic models for request/response validation)
-- ✅ Services (health, data directory, account, meta)
+- ✅ Services (health, data directory, account, statement_file, meta)
 - ✅ Error handling (custom exceptions, error handler decorator)
 - ✅ Account model with enums (AccountType, Currency, EconomicArea)
+- ✅ StatementFile model with enums (StatementFormat, StatementStatus)
+- ✅ Statement file upload with duplicate detection and CSV metadata extraction
+- ✅ Date format inference endpoints using `dateinfer` library
 - ✅ Structured logging with dual output (standard + JSON)
 - ✅ Request ID middleware for log correlation
 - ✅ Error handling with stack traces (dev mode)

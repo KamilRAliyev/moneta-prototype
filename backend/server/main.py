@@ -11,7 +11,7 @@ from server.core import settings
 from server.core.logging import get_logger, setup_logging
 from server.core.middleware import RequestIDMiddleware
 from server.services import data_dir
-from server.api.routers.v1 import accounts, health, meta, system, uploads
+from server.api.routers.v1 import accounts, health, meta, statements, system, uploads
 
 logger = get_logger(__name__)
 
@@ -147,5 +147,6 @@ v1_router.include_router(health.router)
 v1_router.include_router(system.router)
 v1_router.include_router(uploads.router)
 v1_router.include_router(accounts.router)
+v1_router.include_router(statements.router)
 v1_router.include_router(meta.router)
 app.include_router(v1_router)

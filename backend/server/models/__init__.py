@@ -16,3 +16,8 @@ from server.models.account import (
     Currency,
     EconomicArea,
 )  # noqa: E402
+from server.models.statement_file import (
+    StatementFile,
+    StatementFormat,
+    StatementStatus,
+)  # noqa: E402
