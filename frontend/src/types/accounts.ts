@@ -10,6 +10,7 @@ export interface Account {
   account_type: string;
   economic_area: string | null;
   datelock_from: string | null; // ISO date string (YYYY-MM-DD)
+  datelock_to: string | null; // ISO date string (YYYY-MM-DD)
   created_at: string; // ISO datetime string
   updated_at: string | null; // ISO datetime string
 }
@@ -21,6 +22,7 @@ export interface AccountCreateRequest {
   account_type: string;
   economic_area?: string | null;
   datelock_from?: string | null; // ISO date string (YYYY-MM-DD)
+  datelock_to?: string | null; // ISO date string (YYYY-MM-DD)
 }
 
 export interface AccountUpdateRequest {
@@ -30,6 +32,7 @@ export interface AccountUpdateRequest {
   account_type?: string;
   economic_area?: string | null;
   datelock_from?: string | null; // ISO date string (YYYY-MM-DD)
+  datelock_to?: string | null; // ISO date string (YYYY-MM-DD)
 }
 
 export interface AccountTypeOption {

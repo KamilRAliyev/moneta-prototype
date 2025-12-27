@@ -39,6 +39,49 @@ const cancelDelete = () => {
   deleteConfirmId.value = null;
 };
 
+const handleIngest = async (statementId: string) => {
+  try {
+    const result = await store.ingestStatement(statementId);
+    // Show success message or handle errors
+    if (result.summary.errors > 0) {
+      console.warn(
+        `Ingestion completed with ${result.summary.errors} errors`,
+        result.errors,
+      );
+      // TODO: Show error modal or toast notification
+    } else {
+      // TODO: Show success message
+      console.log("Ingestion completed successfully", result);
+    }
+  } catch (err: any) {
+    // Error is handled in the store, but show user-friendly message
+    const errorMessage =
+      err?.response?.data?.detail ||
+      err?.message ||
+      "Failed to ingest statement. Please check the console for details.";
+    console.error("Ingestion failed:", err);
+    alert(`Ingestion failed: ${errorMessage}`);
+  }
+};
+
+const handleIngestAll = async () => {
+  const nonIngested = store.statements.filter((s) => !s.is_ingested);
+  if (nonIngested.length === 0) return;
+
+  try {
+    const statementIds = nonIngested.map((s) => s.id);
+    const results = await store.ingestAllStatements(statementIds);
+    // Show summary or handle errors
+    const totalErrors = results.reduce((sum, r) => sum + r.summary.errors, 0);
+    if (totalErrors > 0) {
+      console.warn(`Bulk ingestion completed with ${totalErrors} total errors`);
+    }
+  } catch (err) {
+    // Error is handled in the store
+    console.error("Bulk ingestion failed:", err);
+  }
+};
+
 onMounted(() => {
   store.loadStatements();
 });
@@ -87,6 +130,8 @@ onMounted(() => {
         :statements="store.statements"
         :is-loading="store.isLoading"
         @delete="handleDelete"
+        @ingest="handleIngest"
+        @ingest-all="handleIngestAll"
       />
     </div>
 

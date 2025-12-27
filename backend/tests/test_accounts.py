@@ -182,6 +182,7 @@ def test_create_account_success(test_db):
         assert data["account_type"] == "checking"
         assert data["economic_area"] == "us"
         assert data["datelock_from"] == "2023-01-01"
+        assert data["datelock_to"] is None
         assert "id" in data
         assert "created_at" in data
 
@@ -204,6 +205,7 @@ def test_create_account_minimal_fields(test_db):
         assert data["name"] == "Minimal Account"
         assert data["economic_area"] is None
         assert data["datelock_from"] is None
+        assert data["datelock_to"] is None
 
 
 def test_create_account_invalid_currency(test_db):
@@ -433,3 +435,151 @@ def test_meta_accounts_options():
     currency_codes = [c["code"] for c in currencies]
     assert "USD" in currency_codes
     assert "EUR" in currency_codes
+
+
+def test_create_account_with_datelock_to(test_db):
+    """Test creating account with datelock_to."""
+    account_data = {
+        "name": "Account with Date Lock",
+        "institution": "Test Bank",
+        "currency": "USD",
+        "account_type": "checking",
+        "datelock_from": "2023-01-01",
+        "datelock_to": "2023-12-31",
+    }
+
+    patch_session, patch_get_db = use_test_db(test_db)
+    with patch_session, patch_get_db:
+        response = client.post("/api/v1/accounts", json=account_data)
+
+        assert response.status_code == 201
+        data = response.json()
+        assert data["datelock_from"] == "2023-01-01"
+        assert data["datelock_to"] == "2023-12-31"
+
+
+def test_create_account_invalid_date_lock_range(test_db):
+    """Test creating account with invalid date lock range (datelock_from > datelock_to)."""
+    account_data = {
+        "name": "Invalid Account",
+        "institution": "Test Bank",
+        "currency": "USD",
+        "account_type": "checking",
+        "datelock_from": "2023-12-31",
+        "datelock_to": "2023-01-01",  # Invalid: from > to
+    }
+
+    patch_session, patch_get_db = use_test_db(test_db)
+    with patch_session, patch_get_db:
+        response = client.post("/api/v1/accounts", json=account_data)
+
+        assert response.status_code == 422
+        data = response.json()
+        assert "details" in data
+        assert len(data["details"]) > 0
+        # Should contain validation error about date range
+        assert any(
+            "datelock_from" in str(error) and "datelock_to" in str(error)
+            for error in data["details"]
+        )
+
+
+def test_create_account_datelock_to_only(test_db):
+    """Test creating account with only datelock_to (no datelock_from)."""
+    account_data = {
+        "name": "Account with Only To",
+        "institution": "Test Bank",
+        "currency": "USD",
+        "account_type": "checking",
+        "datelock_to": "2023-12-31",
+    }
+
+    patch_session, patch_get_db = use_test_db(test_db)
+    with patch_session, patch_get_db:
+        response = client.post("/api/v1/accounts", json=account_data)
+
+        assert response.status_code == 201
+        data = response.json()
+        assert data["datelock_from"] is None
+        assert data["datelock_to"] == "2023-12-31"
+
+
+def test_update_account_with_datelock_to(test_db):
+    """Test updating account with datelock_to."""
+    patch_session, patch_get_db = use_test_db(test_db)
+    with patch_session, patch_get_db:
+        # Create account
+        session = test_db()
+        try:
+            account = Account(
+                name="Original Name",
+                institution="Original Bank",
+                currency=Currency.USD,
+                type=AccountType.CHECKING,
+            )
+            session.add(account)
+            session.commit()
+            session.refresh(account)
+            account_id = account.id
+            session.close()
+
+            # Update with datelock_to
+            update_data = {
+                "datelock_from": "2023-01-01",
+                "datelock_to": "2023-12-31",
+            }
+
+            response = client.put(f"/api/v1/accounts/{account_id}", json=update_data)
+
+            assert response.status_code == 200
+            data = response.json()
+            assert data["datelock_from"] == "2023-01-01"
+            assert data["datelock_to"] == "2023-12-31"
+        finally:
+            try:
+                session.close()
+            except Exception:
+                pass
+
+
+def test_update_account_invalid_date_lock_range(test_db):
+    """Test updating account with invalid date lock range."""
+    patch_session, patch_get_db = use_test_db(test_db)
+    with patch_session, patch_get_db:
+        # Create account
+        session = test_db()
+        try:
+            account = Account(
+                name="Test Account",
+                institution="Test Bank",
+                currency=Currency.USD,
+                type=AccountType.CHECKING,
+            )
+            session.add(account)
+            session.commit()
+            session.refresh(account)
+            account_id = account.id
+            session.close()
+
+            # Try to update with invalid range
+            update_data = {
+                "datelock_from": "2023-12-31",
+                "datelock_to": "2023-01-01",  # Invalid: from > to
+            }
+
+            response = client.put(f"/api/v1/accounts/{account_id}", json=update_data)
+
+            assert response.status_code == 422
+            data = response.json()
+            assert "details" in data
+            assert len(data["details"]) > 0
+            # Should contain validation error about date range
+            assert any(
+                "datelock_from" in str(error) and "datelock_to" in str(error)
+                for error in data["details"]
+            )
+        finally:
+            try:
+                session.close()
+            except Exception:
+                pass

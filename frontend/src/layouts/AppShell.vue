@@ -55,6 +55,17 @@ const route = useRoute();
             >
               Statements
             </RouterLink>
+            <RouterLink
+              to="/transactions"
+              class="px-3 py-2 rounded-md text-sm font-medium transition-colors"
+              :class="
+                route.path.startsWith('/transactions')
+                  ? 'bg-gray-900 text-white dark:bg-gray-700'
+                  : 'text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-700'
+              "
+            >
+              Transactions
+            </RouterLink>
           </nav>
         </div>
       </div>

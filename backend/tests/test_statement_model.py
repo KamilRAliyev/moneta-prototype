@@ -58,6 +58,9 @@ def test_statement_file_model_creation(test_db):
         assert statement.status == StatementStatus.UPLOADED
         assert statement.is_ingested is False
         assert statement.ingested_at is None
+        assert statement.ingested_rows_count == 0
+        assert statement.ingestion_errors_count == 0
+        assert statement.date_column is None
         assert statement.created_at is not None
     finally:
         session.close()
@@ -105,6 +108,9 @@ def test_statement_file_model_with_all_fields(test_db):
         assert statement.date_from == date(2024, 1, 1)
         assert statement.date_to == date(2024, 12, 31)
         assert statement.is_ingested is True
+        assert statement.ingested_rows_count == 0
+        assert statement.ingestion_errors_count == 0
+        assert statement.date_column is None
     finally:
         session.close()
 
@@ -151,6 +157,9 @@ def test_statement_file_model_nullable_fields(test_db):
         assert statement.date_from is None
         assert statement.date_to is None
         assert statement.ingested_at is None
+        assert statement.ingested_rows_count == 0
+        assert statement.ingestion_errors_count == 0
+        assert statement.date_column is None
     finally:
         session.close()
 

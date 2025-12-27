@@ -58,6 +58,9 @@ class StatementFile(Base):
     status = Column(Enum(StatementStatus, native_enum=False), nullable=False)
     is_ingested = Column(Boolean, nullable=False, default=False)
     ingested_at = Column(DateTime(timezone=True), nullable=True)
+    ingested_rows_count = Column(Integer, nullable=False, default=0)
+    ingestion_errors_count = Column(Integer, nullable=False, default=0)
+    date_column = Column(String(255), nullable=True)  # Detected date column name
     created_at = Column(DateTime(timezone=True), server_default=func.now())
     updated_at = Column(DateTime(timezone=True), onupdate=func.now())
 

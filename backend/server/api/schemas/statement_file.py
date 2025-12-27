@@ -28,6 +28,13 @@ class StatementFileResponse(BaseModel):
     status: str
     is_ingested: bool
     ingested_at: Optional[datetime] = None
+    ingested_rows_count: int = Field(
+        default=0, description="Number of rows successfully ingested"
+    )
+    ingestion_errors_count: int = Field(
+        default=0, description="Number of errors encountered during ingestion"
+    )
+    date_column: Optional[str] = Field(None, description="Detected date column name")
     file_exists: bool = Field(..., description="Whether the file exists on disk")
     created_at: datetime
     updated_at: Optional[datetime] = None
@@ -49,6 +56,12 @@ class StatementFileSummary(BaseModel):
     status: str
     is_ingested: bool
     ingested_at: Optional[datetime] = None
+    ingested_rows_count: int = Field(
+        default=0, description="Number of rows successfully ingested"
+    )
+    ingestion_errors_count: int = Field(
+        default=0, description="Number of errors encountered during ingestion"
+    )
     file_exists: bool = Field(..., description="Whether the file exists on disk")
     created_at: datetime
 

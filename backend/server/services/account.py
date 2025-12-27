@@ -111,6 +111,7 @@ class AccountService:
                 type=account_type_enum,
                 economic_area=economic_area_enum,
                 datelock_from=account_data.datelock_from,
+                datelock_to=account_data.datelock_to,
             )
 
             self.db.add(account)
@@ -163,6 +164,8 @@ class AccountService:
                     )
             if account_data.datelock_from is not None:
                 account.datelock_from = account_data.datelock_from
+            if account_data.datelock_to is not None:
+                account.datelock_to = account_data.datelock_to
 
             self.db.commit()
             self.db.refresh(account)

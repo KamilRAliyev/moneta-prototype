@@ -11,7 +11,15 @@ from server.core import settings
 from server.core.logging import get_logger, setup_logging
 from server.core.middleware import RequestIDMiddleware
 from server.services import data_dir
-from server.api.routers.v1 import accounts, health, meta, statements, system, uploads
+from server.api.routers.v1 import (
+    accounts,
+    health,
+    meta,
+    statements,
+    system,
+    transactions,
+    uploads,
+)
 
 logger = get_logger(__name__)
 
@@ -88,17 +96,35 @@ async def http_exception_handler(request: Request, exc: StarletteHTTPException):
     )
 
 
+def _make_json_serializable(obj):
+    """Recursively convert objects to JSON-serializable format."""
+    if isinstance(obj, (str, int, float, bool, type(None))):
+        return obj
+    elif isinstance(obj, dict):
+        return {key: _make_json_serializable(value) for key, value in obj.items()}
+    elif isinstance(obj, (list, tuple)):
+        return [_make_json_serializable(item) for item in obj]
+    else:
+        # Convert any other type to string
+        return str(obj)
+
+
 @app.exception_handler(RequestValidationError)
 async def validation_exception_handler(request: Request, exc: RequestValidationError):
     """Handle validation errors with structured logging."""
+    # Get errors and ensure they're JSON serializable
+    errors = exc.errors()
+    # Convert errors to ensure they're serializable (handle nested dicts with ValueError objects)
+    serializable_errors = _make_json_serializable(errors)
+
     logger.warning(
-        f"Validation error: {exc.errors()}",
-        extra={"path": request.url.path, "errors": exc.errors()},
+        f"Validation error: {serializable_errors}",
+        extra={"path": request.url.path, "errors": serializable_errors},
     )
 
     response_data = {
         "error": "Validation error",
-        "details": exc.errors(),
+        "details": serializable_errors,
         "request_id": getattr(request.state, "request_id", None),
     }
 
@@ -148,5 +174,6 @@ v1_router.include_router(system.router)
 v1_router.include_router(uploads.router)
 v1_router.include_router(accounts.router)
 v1_router.include_router(statements.router)
+v1_router.include_router(transactions.router)
 v1_router.include_router(meta.router)
 app.include_router(v1_router)

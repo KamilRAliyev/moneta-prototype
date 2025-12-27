@@ -5,6 +5,7 @@ from typing import List, Optional
 
 from fastapi import (
     APIRouter,
+    Body,
     Depends,
     File,
     HTTPException,
@@ -28,6 +29,8 @@ from server.services.statement_file import (
     DuplicateStatementFileError,
     StatementFileService,
 )
+from server.services.transaction import TransactionService
+from server.api.schemas.transaction import IngestionResponse
 
 logger = get_logger(__name__)
 
@@ -123,6 +126,9 @@ async def upload_statement(
             status=statement.status.value,
             is_ingested=statement.is_ingested,
             ingested_at=statement.ingested_at,
+            ingested_rows_count=statement.ingested_rows_count,
+            ingestion_errors_count=statement.ingestion_errors_count,
+            date_column=statement.date_column,
             file_exists=file_exists,
             created_at=statement.created_at,
             updated_at=statement.updated_at,
@@ -195,6 +201,8 @@ def list_statements(
             status=stmt.status.value,
             is_ingested=stmt.is_ingested,
             ingested_at=stmt.ingested_at,
+            ingested_rows_count=stmt.ingested_rows_count,
+            ingestion_errors_count=stmt.ingestion_errors_count,
             file_exists=file_exists,
             created_at=stmt.created_at,
         )
@@ -247,6 +255,9 @@ def get_statement(
         status=statement.status.value,
         is_ingested=statement.is_ingested,
         ingested_at=statement.ingested_at,
+        ingested_rows_count=statement.ingested_rows_count,
+        ingestion_errors_count=statement.ingestion_errors_count,
+        date_column=statement.date_column,
         file_exists=file_exists,
         created_at=statement.created_at,
         updated_at=statement.updated_at,
@@ -267,3 +278,74 @@ def delete_statement(statement_id: uuid.UUID, db: Session = Depends(get_db)) -> 
     """
     service = StatementFileService(db)
     service.delete_statement_file(statement_id)
+
+
+@router.post(
+    "/{statement_id}/ingest",
+    response_model=IngestionResponse,
+    status_code=status.HTTP_200_OK,
+)
+@handle_service_errors
+def ingest_statement(
+    statement_id: uuid.UUID, db: Session = Depends(get_db)
+) -> IngestionResponse:
+    """Ingest a single statement file into transactions.
+
+    Args:
+        statement_id: Statement file ID (UUID) to ingest
+        db: Database session
+
+    Returns:
+        IngestionResponse with status, summary, and errors
+
+    Raises:
+        404: Statement file not found
+    """
+    # Verify statement file exists
+    statement_service = StatementFileService(db)
+    statement = statement_service.get_statement_file(statement_id)
+
+    # Ingest using TransactionService
+    transaction_service = TransactionService(db)
+    result = transaction_service.ingest_statement(statement_id)
+
+    return IngestionResponse.model_validate(result)
+
+
+@router.post(
+    "/ingest",
+    response_model=List[IngestionResponse],
+    status_code=status.HTTP_200_OK,
+)
+@handle_service_errors
+def ingest_statements_bulk(
+    statement_ids: List[uuid.UUID] = Body(
+        ..., description="List of statement file IDs to ingest"
+    ),
+    db: Session = Depends(get_db),
+) -> List[IngestionResponse]:
+    """Ingest multiple statement files into transactions.
+
+    Args:
+        statement_ids: List of statement file IDs (UUIDs) to ingest
+        db: Database session
+
+    Returns:
+        List of IngestionResponse for each statement file
+
+    Raises:
+        404: If any statement file is not found
+    """
+    statement_service = StatementFileService(db)
+    transaction_service = TransactionService(db)
+
+    results = []
+    for statement_id in statement_ids:
+        # Verify statement file exists
+        statement = statement_service.get_statement_file(statement_id)
+
+        # Ingest
+        result = transaction_service.ingest_statement(statement_id)
+        results.append(IngestionResponse.model_validate(result))
+
+    return results

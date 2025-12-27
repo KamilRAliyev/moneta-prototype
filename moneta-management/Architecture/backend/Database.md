@@ -221,7 +221,8 @@ The `Account` model represents financial accounts in the system.
 - `currency` (Enum, Required): ISO 4217 currency code (using `iso4217` library)
 - `type` (Enum, Required): Account type (checking, savings, credit_card, cash, investment, loan)
 - `economic_area` (Enum, Optional): Economic region classification (eu, us, uk, cis, mena, apac, china, other)
-- `datelock_from` (Date, Optional): Date lock for ingestion control
+- `datelock_from` (Date, Optional): Date lock start (marks dates >= this as already ingested)
+- `datelock_to` (Date, Optional): Date lock end (marks dates <= this as already ingested)
 - `created_at` (DateTime, Auto): Record creation timestamp
 - `updated_at` (DateTime, Auto): Record last update timestamp
 
@@ -230,10 +231,16 @@ The `Account` model represents financial accounts in the system.
 - `Currency`: All ISO 4217 currency codes (dynamically generated from `iso4217` library)
 - `EconomicArea`: eu, us, uk, cis, mena, apac, china, other
 
-**Date Lock (`datelock_from`):**
-- Per-account ingestion guardrail
-- Transactions before this date cannot be ingested or reprocessed
-- `null` means no lock (full historical ingestion allowed)
+**Date Lock (`datelock_from`, `datelock_to`):**
+- Per-account ingestion guardrail (two-sided date lock)
+- Marks date ranges that have **already been ingested**
+- Transactions **within** `[datelock_from, datelock_to]` (inclusive) → **skipped** (already ingested)
+- Transactions **outside** this range → **ingested** (not yet ingested)
+- Either field can be `null`:
+  - `datelock_from` only: Skip dates >= from, ingest dates < from
+  - `datelock_to` only: Skip dates <= to, ingest dates > to
+  - Both `null`: No lock (ingest all transactions)
+- Validation: `datelock_from <= datelock_to` if both are set
 - Affects future ingestion only (does not delete existing data)
 
 **Model File:** `server/models/account.py`
@@ -262,6 +269,9 @@ The `StatementFile` model represents uploaded CSV statement files associated wit
 - `status` (Enum, Required): Current status: `uploaded` (v1 only, extensible)
 - `is_ingested` (Boolean, Required, Default: false): Whether transactions have been ingested
 - `ingested_at` (DateTime(timezone=True), Optional): Timestamp when ingestion completed (nullable)
+- `ingested_rows_count` (Integer, Required, Default: 0): Number of rows successfully ingested
+- `ingestion_errors_count` (Integer, Required, Default: 0): Number of errors encountered during ingestion
+- `date_column` (String(255), Optional): Detected date column name (for deterministic ingestion)
 - `created_at` (DateTime(timezone=True), Auto): Record creation timestamp
 - `updated_at` (DateTime(timezone=True), Auto): Record last update timestamp
 
@@ -293,7 +303,56 @@ The `StatementFile` model represents uploaded CSV statement files associated wit
 
 **Model File:** `server/models/statement_file.py`
 
-**Migration:** `0a1430f21d66_add_statement_files_table.py`
+**Migrations:**
+- `0a1430f21d66_add_statement_files_table.py` - Initial table creation
+- `be9c3b99c92e_add_statementfile_extensions_ingested_.py` - Added `ingested_rows_count`, `ingestion_errors_count`, `date_column`
+
+### Transaction Model
+
+The `Transaction` model represents ingested transaction data from statement files.
+
+**Table:** `transactions`
+
+**Fields:**
+- `id` (UUID, Primary Key): Unique identifier (UUID v4)
+- `account_id` (Integer, Foreign Key → accounts.id, Required): Account this transaction belongs to
+- `statement_file_id` (UUID, Foreign Key → statement_files.id, Required): Source statement file
+- `row_id` (Integer, Required): Row index in the statement file (0-based)
+- `ingested_content` (JSONB, Required): Raw row data as-is (JSONB for PostgreSQL, JSON for SQLite)
+- `transaction_hash` (String(64), Required): SHA-256 hash of `(row_id + normalized JSON)` for change tracking
+- `computed_content` (JSONB, Optional): Computed/enriched data (empty for now, out of scope)
+- `computed_content_hash` (String(64), Optional): Hash of computed content
+- `inserted_at` (DateTime(timezone=True), Auto): Ingestion timestamp
+- `updated_at` (DateTime(timezone=True), Auto): Last update timestamp
+- `computed_at` (DateTime(timezone=True), Optional): Computation timestamp (null, out of scope)
+
+**Constraints:**
+- Unique constraint: `(statement_file_id, row_id)` - Prevents duplicate rows from same statement (idempotency)
+- Index: `(account_id, inserted_at DESC)` - Optimize list queries by account, ordered by newest first
+- Index: `(statement_file_id)` - Optimize queries by statement file
+- Index: `(transaction_hash)` - For change tracking and diagnostics
+- Foreign key: `account_id` → `accounts.id` (CASCADE on delete)
+- Foreign key: `statement_file_id` → `statement_files.id` (CASCADE on delete)
+
+**Transaction Hash:**
+- Calculated as: `SHA-256(row_id + normalized JSON of ingested_content)`
+- Used for change tracking/diagnostics (detect if content changed between ingestion runs)
+- **NOT used for duplicate detection** - that's handled by unique constraint `(statement_file_id, row_id)`
+- Normalized JSON: keys sorted for consistent hashing regardless of dict order
+
+**Idempotency:**
+- Re-ingesting the same statement file is idempotent
+- Duplicate rows (same `statement_file_id` + `row_id`) are skipped, not updated
+- Allows safe re-ingestion after changing date locks or fixing errors
+
+**Implementation Notes:**
+- Uses `add_all()` for bulk inserts (SQLAlchemy 2.0+ compatible)
+- Transaction error handling with proper rollback on database errors
+- Type-aware sorting uses column metadata from `/meta` endpoint for proper numeric/date/text sorting
+
+**Model File:** `server/models/transaction.py`
+
+**Migration:** `af4e2044a3bb_create_transactions_table.py`
 
 ## Migrations (Alembic)
 

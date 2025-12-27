@@ -20,6 +20,7 @@ kanban-plugin: board
 
 - [x] MON-3: System info endpoint (Backend complete)
 - [x] MON-4: Persistent data directory
+- [x] MON-11: Transactions Ingestion + Transactions View (Complete)
 
 
 

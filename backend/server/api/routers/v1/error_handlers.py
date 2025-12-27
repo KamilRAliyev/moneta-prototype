@@ -29,7 +29,7 @@ def handle_service_errors(func: F) -> F:
         except DatabaseError as e:
             raise HTTPException(
                 status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-                detail="Database operation failed",
+                detail=str(e) or "Database operation failed",
             ) from e
         except SQLAlchemyError as e:
             raise HTTPException(

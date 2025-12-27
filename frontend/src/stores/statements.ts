@@ -1,7 +1,10 @@
 import { defineStore } from "pinia";
 import { ref, computed } from "vue";
 import { statementsService } from "../services/statements";
-import type { StatementFileSummary } from "../types/statements";
+import type {
+  StatementFileSummary,
+  IngestionResponse,
+} from "../types/statements";
 
 export const useStatementsStore = defineStore("statements", () => {
   // State
@@ -85,6 +88,44 @@ export const useStatementsStore = defineStore("statements", () => {
     error.value = null;
   }
 
+  async function ingestStatement(
+    statementId: string,
+  ): Promise<IngestionResponse> {
+    isLoading.value = true;
+    error.value = null;
+    try {
+      const result = await statementsService.ingestStatement(statementId);
+      // Reload statements to update ingestion status
+      await loadStatements(selectedAccountId.value);
+      return result;
+    } catch (err) {
+      error.value =
+        err instanceof Error ? err.message : "Failed to ingest statement";
+      throw err;
+    } finally {
+      isLoading.value = false;
+    }
+  }
+
+  async function ingestAllStatements(
+    statementIds: string[],
+  ): Promise<IngestionResponse[]> {
+    isLoading.value = true;
+    error.value = null;
+    try {
+      const results = await statementsService.ingestStatements(statementIds);
+      // Reload statements to update ingestion status
+      await loadStatements(selectedAccountId.value);
+      return results;
+    } catch (err) {
+      error.value =
+        err instanceof Error ? err.message : "Failed to ingest statements";
+      throw err;
+    } finally {
+      isLoading.value = false;
+    }
+  }
+
   function reset() {
     statements.value = [];
     isLoading.value = false;
@@ -105,6 +146,8 @@ export const useStatementsStore = defineStore("statements", () => {
     loadStatements,
     uploadStatement,
     deleteStatement,
+    ingestStatement,
+    ingestAllStatements,
     setSelectedAccount,
     clearError,
     reset,

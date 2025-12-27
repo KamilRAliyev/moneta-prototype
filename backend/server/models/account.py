@@ -114,5 +114,6 @@ class Account(Base):
     type = Column(Enum(AccountType, native_enum=False), nullable=False)
     economic_area = Column(Enum(EconomicArea, native_enum=False), nullable=True)
     datelock_from = Column(Date, nullable=True)
+    datelock_to = Column(Date, nullable=True)
     created_at = Column(DateTime(timezone=True), server_default=func.now())
     updated_at = Column(DateTime(timezone=True), onupdate=func.now())

@@ -56,6 +56,7 @@ describe("AccountForm", () => {
       account_type: "checking",
       economic_area: "us",
       datelock_from: "2023-01-01",
+      datelock_to: "2023-12-31",
       created_at: "2025-01-01T00:00:00Z",
       updated_at: null,
     };
@@ -168,6 +169,7 @@ describe("AccountForm", () => {
       account_type: "checking",
       economic_area: null,
       datelock_from: null,
+      datelock_to: null,
       created_at: "2025-01-01T00:00:00Z",
       updated_at: null,
     };

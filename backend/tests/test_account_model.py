@@ -59,7 +59,56 @@ def test_account_model_with_all_fields(test_db):
         assert account.type == AccountType.SAVINGS
         assert account.economic_area == EconomicArea.EU
         assert account.datelock_from == date(2023, 1, 1)
+        assert account.datelock_to is None
         assert account.created_at is not None
+    finally:
+        session.close()
+
+
+def test_account_model_with_datelock_to(test_db):
+    """Test Account model with datelock_to field."""
+    session = test_db()
+
+    try:
+        account = Account(
+            name="Test Account",
+            institution="Test Bank",
+            currency=Currency.USD,
+            type=AccountType.CHECKING,
+            datelock_from=date(2023, 1, 1),
+            datelock_to=date(2023, 12, 31),
+        )
+
+        session.add(account)
+        session.commit()
+        session.refresh(account)
+
+        assert account.datelock_from == date(2023, 1, 1)
+        assert account.datelock_to == date(2023, 12, 31)
+    finally:
+        session.close()
+
+
+def test_account_model_datelock_to_nullable(test_db):
+    """Test that datelock_to can be None."""
+    session = test_db()
+
+    try:
+        account = Account(
+            name="Test Account",
+            institution="Test Bank",
+            currency=Currency.USD,
+            type=AccountType.CHECKING,
+            datelock_from=date(2023, 1, 1),
+            datelock_to=None,
+        )
+
+        session.add(account)
+        session.commit()
+        session.refresh(account)
+
+        assert account.datelock_from == date(2023, 1, 1)
+        assert account.datelock_to is None
     finally:
         session.close()
 

@@ -82,14 +82,14 @@ class StatementFileService:
 
     def _extract_csv_metadata(
         self, content: bytes
-    ) -> Tuple[int, Optional[List[str]], Optional[date], Optional[date]]:
+    ) -> Tuple[int, Optional[List[str]], Optional[date], Optional[date], Optional[str]]:
         """Extract metadata from CSV content.
 
         Args:
             content: CSV file content as bytes
 
         Returns:
-            Tuple of (row_count, columns, date_from, date_to)
+            Tuple of (row_count, columns, date_from, date_to, date_column)
         """
         try:
             # Decode content
@@ -102,7 +102,7 @@ class StatementFileService:
                 columns = header if header else None
             except StopIteration:
                 # Empty file
-                return 0, None, None, None
+                return 0, None, None, None, None
 
             # Count rows and find date column
             row_count = 0
@@ -117,9 +117,11 @@ class StatementFileService:
                 "date",
                 "transaction_date",
             ]
+            date_column_name = None
             for idx, col_name in enumerate(header):
                 if col_name in date_column_names:
                     date_column_index = idx
+                    date_column_name = col_name
                     break
 
             # Read data rows
@@ -170,7 +172,7 @@ class StatementFileService:
                         exc_info=True,
                     )
 
-            return row_count, columns, date_from, date_to
+            return row_count, columns, date_from, date_to, date_column_name
 
         except Exception as e:
             logger.warning(
@@ -178,7 +180,7 @@ class StatementFileService:
                 exc_info=True,
             )
             # Return defaults on failure
-            return 0, None, None, None
+            return 0, None, None, None, None
 
     def _check_duplicate(
         self, account_id: int, content_hash: str
@@ -297,8 +299,8 @@ class StatementFileService:
         stored_path = statements_dir / stored_filename
 
         # Extract CSV metadata
-        row_count, columns, date_from, date_to = self._extract_csv_metadata(
-            file_content
+        row_count, columns, date_from, date_to, date_column = (
+            self._extract_csv_metadata(file_content)
         )
 
         # Create statement file record
@@ -317,6 +319,9 @@ class StatementFileService:
             date_to=date_to,
             status=StatementStatus.UPLOADED,
             is_ingested=False,
+            ingested_rows_count=0,
+            ingestion_errors_count=0,
+            date_column=date_column,
         )
 
         try:

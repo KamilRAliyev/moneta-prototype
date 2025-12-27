@@ -1,7 +1,10 @@
+name: illiterate_monkey
+
 services:
   postgres:
     image: postgres:16-alpine
     container_name: illiterate_monkey_db
+    restart: unless-stopped
     env_file:
       - ../../env/dev.env
     ports:
@@ -19,6 +22,7 @@ services:
   pg_admin:
     image: dpage/pgadmin4:latest
     container_name: illiterate_monkey_pgadmin
+    restart: unless-stopped
     env_file:
       - ../../env/dev.env
     ports:
@@ -35,6 +39,7 @@ services:
       context: ../..
       dockerfile: deploy/docker/Dockerfile
     container_name: illiterate_monkey_app
+    restart: unless-stopped
     env_file:
       - ../../env/dev.env
     ports:

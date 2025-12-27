@@ -4,6 +4,7 @@ import type {
   StatementFileSummary,
   DateFormatInferenceResponse,
   SupportedDateFormatsResponse,
+  IngestionResponse,
 } from "../types/statements";
 
 /**
@@ -89,6 +90,27 @@ export const statementsService = {
   async getSupportedDateFormats(): Promise<SupportedDateFormatsResponse> {
     const response = await apiClient.get<SupportedDateFormatsResponse>(
       "/meta/statements/date-formats",
+    );
+    return response.data;
+  },
+
+  /**
+   * Ingest a single statement file into transactions
+   */
+  async ingestStatement(statementId: string): Promise<IngestionResponse> {
+    const response = await apiClient.post<IngestionResponse>(
+      `/statements/${statementId}/ingest`,
+    );
+    return response.data;
+  },
+
+  /**
+   * Bulk ingest multiple statement files
+   */
+  async ingestStatements(statementIds: string[]): Promise<IngestionResponse[]> {
+    const response = await apiClient.post<IngestionResponse[]>(
+      "/statements/ingest",
+      statementIds,
     );
     return response.data;
   },

@@ -31,6 +31,7 @@ const currency = ref("");
 const accountType = ref("");
 const economicArea = ref<string | null>(null);
 const datelockFrom = ref<string | null>(null);
+const datelockTo = ref<string | null>(null);
 
 // Meta options
 const accountTypes = ref<Array<{ value: string; label: string }>>([]);
@@ -61,6 +62,7 @@ onMounted(async () => {
     accountType.value = props.account.account_type;
     economicArea.value = props.account.economic_area;
     datelockFrom.value = props.account.datelock_from;
+    datelockTo.value = props.account.datelock_to;
   }
 });
 
@@ -85,6 +87,13 @@ const validate = (): boolean => {
     errors.value.accountType = "Account type is required";
   }
 
+  // Validate date lock range
+  if (datelockFrom.value && datelockTo.value) {
+    if (new Date(datelockFrom.value) > new Date(datelockTo.value)) {
+      errors.value.datelock = "From date must be less than or equal to To date";
+    }
+  }
+
   return Object.keys(errors.value).length === 0;
 };
 
@@ -100,6 +109,7 @@ const handleSubmit = () => {
     account_type: accountType.value,
     economic_area: economicArea.value || null,
     datelock_from: datelockFrom.value || null,
+    datelock_to: datelockTo.value || null,
   };
 
   emit("submit", payload);
@@ -245,7 +255,13 @@ const handleCancel = () => {
     </div>
 
     <!-- Date Lock -->
-    <DateLockField v-model="datelockFrom" :error="errors.datelockFrom" />
+    <DateLockField
+      :datelock-from="datelockFrom"
+      :datelock-to="datelockTo"
+      :error="errors.datelock"
+      @update:datelock-from="datelockFrom = $event"
+      @update:datelock-to="datelockTo = $event"
+    />
 
     <!-- Error Message -->
     <div

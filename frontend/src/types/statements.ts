@@ -19,6 +19,9 @@ export interface StatementFile {
   status: string;
   is_ingested: boolean;
   ingested_at: string | null; // ISO datetime string
+  ingested_rows_count: number;
+  ingestion_errors_count: number;
+  date_column: string | null;
   file_exists: boolean; // Whether the file exists on disk
   created_at: string; // ISO datetime string
   updated_at: string | null; // ISO datetime string
@@ -36,8 +39,31 @@ export interface StatementFileSummary {
   status: string;
   is_ingested: boolean;
   ingested_at: string | null; // ISO datetime string
+  ingested_rows_count: number;
+  ingestion_errors_count: number;
+  date_column: string | null;
   file_exists: boolean; // Whether the file exists on disk
   created_at: string; // ISO datetime string
+}
+
+export interface IngestionError {
+  row_id: number;
+  reason: string;
+  message: string;
+}
+
+export interface IngestionSummary {
+  total_rows: number;
+  ingested: number;
+  skipped: number;
+  errors: number;
+}
+
+export interface IngestionResponse {
+  statement_id: string; // UUID
+  status: "completed" | "partial" | "failed";
+  summary: IngestionSummary;
+  errors: IngestionError[];
 }
 
 export interface DuplicateStatementFileResponse {

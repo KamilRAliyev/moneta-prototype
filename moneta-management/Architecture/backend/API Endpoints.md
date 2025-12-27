@@ -560,6 +560,254 @@ Get list of all date formats supported by the system. Useful for UI dropdowns or
 - Used for UI documentation or format selection
 - Actual parsing uses flexible `dateutil.parser` which handles more variations
 
+### Transactions (v1)
+
+#### `GET /api/v1/transactions`
+
+List transactions with pagination, sorting, and filtering.
+
+**Query Parameters:**
+- `account_id` (integer, optional): Filter by account ID
+- `statement_file_id` (UUID, optional): Filter by statement file ID
+- `page` (integer, optional): Page number (1-based, default: 1)
+- `page_size` (integer, optional): Items per page (default: 50, max: 100)
+- `sort_by` (string, optional): Field to sort by (default: "inserted_at")
+  - Regular fields: `inserted_at`, `row_id`, `statement_file_id`
+  - Dynamic fields: `ingested_content.<field>` (e.g., `ingested_content.date`, `ingested_content.amount`)
+  - **Type-aware sorting**: Dynamic fields are sorted using column metadata (numeric fields as numbers, date fields as dates, text fields as text)
+- `sort_dir` (string, optional): Sort direction - `asc` or `desc` (default: "desc")
+- `filters` (string, optional): Filter string (format: `field1:operator:value,field2:operator:value`)
+
+**Filter Format:**
+- Format: `field:operator:value`
+- Multiple filters: comma-separated (AND logic)
+- Supported operators: `=`, `!=`, `>`, `>=`, `<`, `<=`, `contains`, `empty`, `not_empty`
+- Examples:
+  - `ingested_content.date:>=:2024-01-01` - Date >= 2024-01-01
+  - `ingested_content.amount:>:100` - Amount > 100
+  - `ingested_content.description:contains:Coffee` - Description contains "Coffee"
+
+**Response (200 OK):**
+```json
+{
+  "items": [
+    {
+      "id": "550e8400-e29b-41d4-a716-446655440000",
+      "row_id": 0,
+      "statement_file": {
+        "id": "660e8400-e29b-41d4-a716-446655440001",
+        "original_filename": "statement.csv",
+        "columns": ["Date", "Description", "Amount"]
+      },
+      "account": {
+        "id": 1,
+        "name": "My Checking Account",
+        "institution": "Bank of Example",
+        "currency": "USD",
+        "type": "checking",
+        "economic_area": "us",
+        "datelock_from": "2023-01-01",
+        "datelock_to": "2024-12-31"
+      },
+      "ingested_content": {
+        "date": "2024-01-01",
+        "amount": "-4.50",
+        "description": "Coffee"
+      },
+      "computed_content": {},
+      "inserted_at": "2025-12-26T10:00:00Z"
+    }
+  ],
+  "meta": {
+    "page": 1,
+    "page_size": 50,
+    "total": 150,
+    "total_pages": 3
+  }
+}
+```
+
+#### `GET /api/v1/transactions/meta`
+
+Get transaction column metadata for dynamic table UI.
+
+**Query Parameters:**
+- `account_id` (integer, optional): Filter by account ID (per-account metadata)
+
+**Response (200 OK):**
+```json
+{
+  "ingested_columns": [
+    {
+      "name": "date",
+      "type": "date",
+      "sample_values": ["2024-01-01", "2024-01-15", "2024-02-01"],
+      "nullable": false,
+      "min": "2024-01-01",
+      "max": "2024-12-31"
+    },
+    {
+      "name": "amount",
+      "type": "number",
+      "sample_values": ["-4.50", "100.00", "2500.00"],
+      "nullable": false,
+      "min": -1000.00,
+      "max": 10000.00
+    },
+    {
+      "name": "description",
+      "type": "string",
+      "sample_values": ["Coffee", "Salary", "Rent"],
+      "nullable": true
+    }
+  ],
+  "computed_columns": []
+}
+```
+
+**Response Fields:**
+- `ingested_columns` (array): Column metadata from `ingested_content` JSONB
+  - `name` (string): Column name
+  - `type` (string): Inferred type - `date`, `number`, or `string`
+  - `sample_values` (array): Sample values (up to 10)
+  - `nullable` (boolean): Whether column can be null
+  - `min` (any, optional): Minimum value (for date/number types)
+  - `max` (any, optional): Maximum value (for date/number types)
+- `computed_columns` (array): Empty for now (out of scope)
+
+**Notes:**
+- Samples up to 200 transactions for metadata extraction
+- Per-account aggregation (not global) - different banks have different columns
+- Type inference: date > number > string (prioritized)
+
+#### `DELETE /api/v1/transactions`
+
+Delete transactions with optional account filter.
+
+**Query Parameters:**
+- `account_id` (integer, optional): Delete transactions for specific account only
+
+**Response (200 OK):**
+```json
+{
+  "deleted_count": 150
+}
+```
+
+**Behavior:**
+- If `account_id` provided: Deletes transactions for that account only
+- If `account_id` not provided: Deletes all transactions (global delete)
+- Sets `statement_files.is_ingested = false` for affected statements
+- Does NOT delete statement files
+
+**Error Responses:**
+- `500 Internal Server Error`: Database error
+
+### Statement Ingestion (v1)
+
+#### `POST /api/v1/statements/{statement_id}/ingest`
+
+Ingest a single statement file into transactions.
+
+**Path Parameters:**
+- `statement_id` (UUID): Statement file ID to ingest
+
+**Response (200 OK):**
+```json
+{
+  "statement_id": "550e8400-e29b-41d4-a716-446655440000",
+  "status": "completed",
+  "summary": {
+    "total_rows": 1000,
+    "ingested": 850,
+    "skipped": 150,
+    "errors": 0
+  },
+  "errors": []
+}
+```
+
+**Response Fields:**
+- `status` (string): `completed` | `partial` | `failed`
+- `summary` (object): Ingestion summary
+  - `total_rows` (integer): Total rows in statement
+  - `ingested` (integer): Number of rows successfully ingested
+  - `skipped` (integer): Number of rows skipped (duplicates or date lock)
+  - `errors` (integer): Number of errors encountered
+- `errors` (array): List of error details (if any)
+  - `row_id` (integer): Row index that failed
+  - `reason` (string): Error reason (`date_lock`, `parse_error`, etc.)
+  - `message` (string): Error message
+
+**Behavior:**
+- Applies date lock rules (two-sided: `datelock_from` and `datelock_to`)
+- Uses persisted `date_column` from statement (if present)
+- Re-infers date format using `dateinfer` during ingestion
+- Creates transactions (skips rows with existing `(statement_file_id, row_id)` - idempotent)
+- Uses bulk insert for performance (batches of 1000, using `add_all()` for SQLAlchemy 2.0+)
+- Collects errors but continues processing
+- Sets `statement_files.is_ingested = true` if ingestion completed
+- Updates `ingested_rows_count`, `ingestion_errors_count`, `ingested_at` on statement
+
+**Error Responses:**
+- `404 Not Found`: Statement file not found
+- `500 Internal Server Error`: Database or file system error
+
+#### `POST /api/v1/statements/ingest`
+
+Bulk ingest multiple statement files.
+
+**Request Body:**
+```json
+[
+  "550e8400-e29b-41d4-a716-446655440000",
+  "660e8400-e29b-41d4-a716-446655440001"
+]
+```
+
+**Response (200 OK):**
+```json
+[
+  {
+    "statement_id": "550e8400-e29b-41d4-a716-446655440000",
+    "status": "completed",
+    "summary": {
+      "total_rows": 1000,
+      "ingested": 850,
+      "skipped": 150,
+      "errors": 0
+    },
+    "errors": []
+  },
+  {
+    "statement_id": "660e8400-e29b-41d4-a716-446655440001",
+    "status": "partial",
+    "summary": {
+      "total_rows": 500,
+      "ingested": 450,
+      "skipped": 0,
+      "errors": 50
+    },
+    "errors": [
+      {
+        "row_id": 5,
+        "reason": "parse_error",
+        "message": "Failed to parse date: 'invalid-date'"
+      }
+    ]
+  }
+]
+```
+
+**Behavior:**
+- Ingests all provided statement files (synchronous, one at a time)
+- Returns list of `IngestionResponse` for each statement
+- Each statement is processed independently
+
+**Error Responses:**
+- `404 Not Found`: Any statement file not found
+- `500 Internal Server Error`: Database or file system error
+
 ## Future Endpoints
 
 The following endpoints are planned but not yet implemented:

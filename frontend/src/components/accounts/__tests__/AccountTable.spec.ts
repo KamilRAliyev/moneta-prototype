@@ -12,6 +12,7 @@ const mockAccounts: Account[] = [
     account_type: "checking",
     economic_area: "us",
     datelock_from: "2023-01-01",
+    datelock_to: "2023-12-31",
     created_at: "2025-01-01T00:00:00Z",
     updated_at: null,
   },
@@ -23,6 +24,7 @@ const mockAccounts: Account[] = [
     account_type: "savings",
     economic_area: null,
     datelock_from: null,
+    datelock_to: null,
     created_at: "2025-01-01T00:00:00Z",
     updated_at: null,
   },
@@ -62,7 +64,7 @@ describe("AccountTable", () => {
       },
     });
 
-    expect(wrapper.text()).toContain("Locked before: 2023-01-01");
+    expect(wrapper.text()).toContain("2023-01-01 to 2023-12-31");
     expect(wrapper.text()).toContain("No date lock");
   });
 

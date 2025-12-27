@@ -3,7 +3,14 @@
 from datetime import date, datetime
 from typing import Optional
 
-from pydantic import BaseModel, ConfigDict, Field, field_serializer, model_validator
+from pydantic import (
+    BaseModel,
+    ConfigDict,
+    Field,
+    ValidationError,
+    field_serializer,
+    model_validator,
+)
 
 from server.models.account import AccountType, Currency, EconomicArea
 
@@ -21,8 +28,22 @@ class AccountBase(BaseModel):
         None, description="Economic area classification"
     )
     datelock_from: Optional[date] = Field(
-        None, description="Date lock for ingestion (nullable)"
+        None,
+        description="Date lock for ingestion - marks dates >= this date as already ingested (nullable)",
     )
+    datelock_to: Optional[date] = Field(
+        None,
+        description="Date lock for ingestion - marks dates <= this date as already ingested (nullable)",
+    )
+
+    @model_validator(mode="after")
+    def validate_date_lock_range(self):
+        """Validate that datelock_from <= datelock_to if both are set."""
+        if self.datelock_from is not None and self.datelock_to is not None:
+            if self.datelock_from > self.datelock_to:
+                error_msg = f"datelock_from ({self.datelock_from}) must be <= datelock_to ({self.datelock_to})"
+                raise ValueError(error_msg)
+        return self
 
 
 class AccountCreate(AccountBase):
@@ -40,6 +61,16 @@ class AccountUpdate(BaseModel):
     account_type: Optional[str] = None
     economic_area: Optional[str] = None
     datelock_from: Optional[date] = None
+    datelock_to: Optional[date] = None
+
+    @model_validator(mode="after")
+    def validate_date_lock_range(self):
+        """Validate that datelock_from <= datelock_to if both are set."""
+        if self.datelock_from is not None and self.datelock_to is not None:
+            if self.datelock_from > self.datelock_to:
+                error_msg = f"datelock_from ({self.datelock_from}) must be <= datelock_to ({self.datelock_to})"
+                raise ValueError(error_msg)
+        return self
 
 
 class AccountResponse(AccountBase):

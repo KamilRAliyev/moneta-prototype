@@ -16,9 +16,12 @@ interface Emits {
 const props = defineProps<Props>();
 const emit = defineEmits<Emits>();
 
-const formatDate = (dateString: string | null): string => {
-  if (!dateString) return "No date lock";
-  return `Locked before: ${dateString}`;
+const formatDateLock = (from: string | null, to: string | null): string => {
+  if (!from && !to) return "No date lock";
+  if (from && to) return `${from} to ${to}`;
+  if (from) return `From: ${from}`;
+  if (to) return `To: ${to}`;
+  return "No date lock";
 };
 
 const formatAccountType = (type: string): string => {
@@ -136,7 +139,7 @@ const formatAccountType = (type: string): string => {
           <td
             class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400"
           >
-            {{ formatDate(account.datelock_from) }}
+            {{ formatDateLock(account.datelock_from, account.datelock_to) }}
           </td>
           <td
             class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium"

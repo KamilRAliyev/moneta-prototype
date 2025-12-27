@@ -86,6 +86,11 @@ def test_upload_statement_success(test_db, temp_data_dir):
                 assert data["is_ingested"] is False
                 assert data["file_exists"] is True  # File should exist after upload
                 assert "row_count" in data
+                # Verify new fields are set correctly
+                # Verify new fields are set correctly
+                assert data["ingested_rows_count"] == 0
+                assert data["ingestion_errors_count"] == 0
+                assert data["date_column"] == "Date"  # Should detect "Date" column
         finally:
             try:
                 session.close()

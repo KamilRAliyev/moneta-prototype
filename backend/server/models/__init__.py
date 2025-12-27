@@ -21,3 +21,4 @@ from server.models.statement_file import (
     StatementFormat,
     StatementStatus,
 )  # noqa: E402
+from server.models.transaction import Transaction  # noqa: E402
