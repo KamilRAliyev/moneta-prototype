@@ -88,7 +88,7 @@ describe("StatementTable", () => {
     expect(wrapper.text()).toMatch(/\d+\/\d+\/\d+.*\d+\/\d+\/\d+/);
   });
 
-  it("shows loading state", () => {
+  it("shows loading state with skeleton loaders", () => {
     const wrapper = mount(StatementTable, {
       props: {
         statements: [],
@@ -96,7 +96,9 @@ describe("StatementTable", () => {
       },
     });
 
-    expect(wrapper.text()).toContain("Loading statements...");
+    // Should show skeleton loaders instead of "Loading statements..." text
+    const skeletons = wrapper.findAll('[class*="animate-pulse"]');
+    expect(skeletons.length).toBeGreaterThan(0);
   });
 
   it("shows empty state", () => {

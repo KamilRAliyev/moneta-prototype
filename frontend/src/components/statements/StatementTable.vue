@@ -1,5 +1,7 @@
 <script setup lang="ts">
 import { computed } from "vue";
+import { Button } from "@/components/ui/button";
+import { Skeleton } from "@/components/ui/skeleton";
 import type { StatementFileSummary } from "../../types/statements";
 
 interface Props {
@@ -75,210 +77,246 @@ const formatIngestionStatus = (statement: StatementFileSummary): string => {
   <div class="space-y-4">
     <!-- Ingest All Button -->
     <div v-if="nonIngestedStatements.length > 0" class="flex justify-end">
-      <button
-        @click="emit('ingest-all')"
-        :disabled="isLoading"
-        class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 disabled:bg-gray-400 disabled:cursor-not-allowed transition-colors"
-      >
+      <Button @click="emit('ingest-all')" :disabled="isLoading">
         Ingest All ({{ nonIngestedStatements.length }})
-      </button>
+      </Button>
     </div>
 
-    <div class="overflow-x-auto -mx-4 sm:mx-0">
-      <table
-        class="min-w-full divide-y divide-gray-200 dark:divide-gray-700 bg-white dark:bg-gray-800 shadow rounded-lg"
-      >
-        <thead
-          class="bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700"
-        >
-          <tr>
-            <th
-              scope="col"
-              class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider"
-            >
-              Uploaded At
-            </th>
-            <th
-              scope="col"
-              class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider"
-            >
-              Filename
-            </th>
-            <th
-              scope="col"
-              class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider"
-            >
-              Account
-            </th>
-            <th
-              scope="col"
-              class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider"
-            >
-              Size
-            </th>
-            <th
-              scope="col"
-              class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider"
-            >
-              Rows
-            </th>
-            <th
-              scope="col"
-              class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider"
-            >
-              Date Range
-            </th>
-            <th
-              scope="col"
-              class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider"
-            >
-              Status
-            </th>
-            <th
-              scope="col"
-              class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider"
-            >
-              Ingested
-            </th>
-            <th
-              scope="col"
-              class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider"
-            >
-              File
-            </th>
-            <th
-              scope="col"
-              class="px-6 py-3 text-right text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider"
-            >
-              Actions
-            </th>
-          </tr>
-        </thead>
-        <tbody
-          class="bg-white dark:bg-gray-800 divide-y divide-gray-100 dark:divide-gray-700"
-        >
-          <tr v-if="props.isLoading" class="text-center">
-            <td
-              colspan="10"
-              class="px-6 py-4 text-sm text-gray-500 dark:text-gray-400"
-            >
-              Loading statements...
-            </td>
-          </tr>
-          <tr v-else-if="props.statements.length === 0" class="text-center">
-            <td
-              colspan="10"
-              class="px-6 py-4 text-sm text-gray-500 dark:text-gray-400"
-            >
-              No statements found. Upload your first statement to get started.
-            </td>
-          </tr>
-          <tr
-            v-for="statement in props.statements"
-            :key="statement.id"
-            class="hover:bg-blue-50 dark:hover:bg-gray-700 transition-colors"
-          >
-            <td
-              class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400"
-            >
-              {{ formatDateTime(statement.created_at) }}
-            </td>
-            <td
-              class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900 dark:text-white"
-            >
-              {{ statement.original_filename }}
-            </td>
-            <td
-              class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400"
-            >
-              {{ statement.account_name || `Account #${statement.account_id}` }}
-            </td>
-            <td
-              class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400"
-            >
-              {{ formatFileSize(statement.size_bytes) }}
-            </td>
-            <td
-              class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400"
-            >
-              {{ statement.row_count.toLocaleString() }}
-            </td>
-            <td
-              class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400"
-            >
-              {{ formatDateRange(statement.date_from, statement.date_to) }}
-            </td>
-            <td class="px-6 py-4 whitespace-nowrap text-sm">
-              <span
-                class="px-2 py-1 text-xs font-medium rounded-full"
-                :class="
-                  statement.status === 'uploaded'
-                    ? 'bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-300'
-                    : 'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300'
-                "
+    <div class="-mx-4 sm:mx-0">
+      <div class="overflow-x-auto">
+        <table class="w-full divide-y divide-border bg-card shadow rounded-lg">
+          <thead class="bg-card border-b border-border">
+            <tr>
+              <th
+                scope="col"
+                class="px-3 py-2 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider whitespace-nowrap"
               >
-                {{ statement.status }}
-              </span>
-            </td>
-            <td class="px-6 py-4 whitespace-nowrap text-sm">
-              <span
-                v-if="statement.is_ingested"
-                class="px-2 py-1 text-xs font-medium rounded-full"
-                :class="
-                  (statement.ingestion_errors_count ?? 0) > 0
-                    ? 'bg-orange-100 text-orange-800 dark:bg-orange-900/30 dark:text-orange-300'
-                    : statement.ingested_rows_count === statement.row_count
-                      ? 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300'
-                      : 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-300'
-                "
-                :title="formatIngestionStatus(statement)"
+                Uploaded At
+              </th>
+              <th
+                scope="col"
+                class="px-3 py-2 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider"
               >
-                {{ formatIngestionStatus(statement) }}
-              </span>
-              <span
-                v-else
-                class="px-2 py-1 text-xs font-medium rounded-full bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-300"
+                Filename
+              </th>
+              <th
+                scope="col"
+                class="px-3 py-2 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider"
               >
-                ⏳ Not ingested
-              </span>
-            </td>
-            <td class="px-6 py-4 whitespace-nowrap text-sm">
-              <span
-                v-if="statement.file_exists"
-                class="px-2 py-1 text-xs font-medium rounded-full bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300"
-                title="File exists on disk"
+                Account
+              </th>
+              <th
+                scope="col"
+                class="px-3 py-2 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider whitespace-nowrap"
               >
-                ✓ Exists
-              </span>
-              <span
-                v-else
-                class="px-2 py-1 text-xs font-medium rounded-full bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-300"
-                title="File missing from disk"
+                Size
+              </th>
+              <th
+                scope="col"
+                class="px-3 py-2 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider whitespace-nowrap"
               >
-                ✗ Missing
-              </span>
-            </td>
-            <td
-              class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium space-x-2"
-            >
-              <button
-                v-if="!statement.is_ingested"
-                @click="emit('ingest', statement.id)"
-                :disabled="isLoading"
-                class="px-3 py-1 bg-blue-600 text-white text-xs rounded-md hover:bg-blue-700 disabled:bg-gray-400 disabled:cursor-not-allowed transition-colors"
+                Rows
+              </th>
+              <th
+                scope="col"
+                class="px-3 py-2 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider"
               >
-                Ingest
-              </button>
-              <button
-                @click="emit('delete', statement)"
-                class="text-red-600 dark:text-red-400 hover:text-red-900 dark:hover:text-red-300 transition-colors"
+                Date Range
+              </th>
+              <th
+                scope="col"
+                class="px-3 py-2 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider whitespace-nowrap"
               >
-                Delete
-              </button>
-            </td>
-          </tr>
-        </tbody>
-      </table>
+                Status
+              </th>
+              <th
+                scope="col"
+                class="px-3 py-2 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider whitespace-nowrap"
+              >
+                Ingested
+              </th>
+              <th
+                scope="col"
+                class="px-3 py-2 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider whitespace-nowrap"
+              >
+                File
+              </th>
+              <th
+                scope="col"
+                class="px-3 py-2 text-right text-xs font-medium text-muted-foreground uppercase tracking-wider whitespace-nowrap"
+              >
+                Actions
+              </th>
+            </tr>
+          </thead>
+          <tbody class="bg-card divide-y divide-border">
+            <template v-if="props.isLoading">
+              <tr
+                v-for="i in 5"
+                :key="`skeleton-${i}`"
+                class="hover:bg-muted/50"
+              >
+                <td class="px-3 py-2">
+                  <Skeleton class="h-4 w-32" />
+                </td>
+                <td class="px-3 py-2">
+                  <Skeleton class="h-4 w-40" />
+                </td>
+                <td class="px-3 py-2">
+                  <Skeleton class="h-4 w-24" />
+                </td>
+                <td class="px-3 py-2">
+                  <Skeleton class="h-4 w-16" />
+                </td>
+                <td class="px-3 py-2">
+                  <Skeleton class="h-4 w-12" />
+                </td>
+                <td class="px-3 py-2">
+                  <Skeleton class="h-4 w-28" />
+                </td>
+                <td class="px-3 py-2">
+                  <Skeleton class="h-4 w-20" />
+                </td>
+                <td class="px-3 py-2">
+                  <Skeleton class="h-4 w-24" />
+                </td>
+                <td class="px-3 py-2">
+                  <Skeleton class="h-4 w-16" />
+                </td>
+                <td class="px-3 py-2 text-right">
+                  <div class="flex justify-end gap-2">
+                    <Skeleton class="h-8 w-16" />
+                    <Skeleton class="h-8 w-16" />
+                  </div>
+                </td>
+              </tr>
+            </template>
+            <template v-else-if="props.statements.length === 0">
+              <tr class="text-center">
+                <td
+                  colspan="10"
+                  class="px-6 py-4 text-sm text-muted-foreground"
+                >
+                  No statements found. Upload your first statement to get
+                  started.
+                </td>
+              </tr>
+            </template>
+            <template v-else>
+              <tr
+                v-for="statement in props.statements"
+                :key="statement.id"
+                class="hover:bg-muted/50 transition-colors"
+              >
+                <td
+                  class="px-3 py-2 whitespace-nowrap text-sm text-muted-foreground"
+                >
+                  {{ formatDateTime(statement.created_at) }}
+                </td>
+                <td
+                  class="px-3 py-2 text-sm font-medium text-foreground max-w-xs truncate"
+                >
+                  {{ statement.original_filename }}
+                </td>
+                <td
+                  class="px-3 py-2 text-sm text-muted-foreground max-w-[120px] truncate"
+                >
+                  {{
+                    statement.account_name || `Account #${statement.account_id}`
+                  }}
+                </td>
+                <td
+                  class="px-3 py-2 whitespace-nowrap text-sm text-muted-foreground"
+                >
+                  {{ formatFileSize(statement.size_bytes) }}
+                </td>
+                <td
+                  class="px-3 py-2 whitespace-nowrap text-sm text-muted-foreground"
+                >
+                  {{ statement.row_count.toLocaleString() }}
+                </td>
+                <td
+                  class="px-3 py-2 text-sm text-muted-foreground max-w-[140px] truncate"
+                >
+                  {{ formatDateRange(statement.date_from, statement.date_to) }}
+                </td>
+                <td class="px-3 py-2 whitespace-nowrap text-sm">
+                  <span
+                    class="px-2 py-1 text-xs font-medium rounded-full"
+                    :class="
+                      statement.status === 'uploaded'
+                        ? 'bg-primary/10 text-primary'
+                        : 'bg-muted text-muted-foreground'
+                    "
+                  >
+                    {{ statement.status }}
+                  </span>
+                </td>
+                <td class="px-3 py-2 whitespace-nowrap text-sm">
+                  <span
+                    v-if="statement.is_ingested"
+                    class="px-2 py-1 text-xs font-medium rounded-full"
+                    :class="
+                      (statement.ingestion_errors_count ?? 0) > 0
+                        ? 'bg-destructive/10 text-destructive'
+                        : statement.ingested_rows_count === statement.row_count
+                          ? 'bg-green-500/10 text-green-600 dark:text-green-400'
+                          : 'bg-yellow-500/10 text-yellow-600 dark:text-yellow-400'
+                    "
+                    :title="formatIngestionStatus(statement)"
+                  >
+                    {{ formatIngestionStatus(statement) }}
+                  </span>
+                  <span
+                    v-else
+                    class="px-2 py-1 text-xs font-medium rounded-full bg-yellow-500/10 text-yellow-600 dark:text-yellow-400"
+                  >
+                    ⏳ Not ingested
+                  </span>
+                </td>
+                <td class="px-3 py-2 whitespace-nowrap text-sm">
+                  <span
+                    v-if="statement.file_exists"
+                    class="px-2 py-1 text-xs font-medium rounded-full bg-green-500/10 text-green-600 dark:text-green-400"
+                    title="File exists on disk"
+                  >
+                    ✓ Exists
+                  </span>
+                  <span
+                    v-else
+                    class="px-2 py-1 text-xs font-medium rounded-full bg-destructive/10 text-destructive"
+                    title="File missing from disk"
+                  >
+                    ✗ Missing
+                  </span>
+                </td>
+                <td
+                  class="px-3 py-2 whitespace-nowrap text-right text-sm font-medium space-x-2"
+                >
+                  <div class="flex justify-end gap-2">
+                    <Button
+                      v-if="!statement.is_ingested"
+                      @click="emit('ingest', statement.id)"
+                      :disabled="isLoading"
+                      size="sm"
+                    >
+                      Ingest
+                    </Button>
+                    <Button
+                      @click="emit('delete', statement)"
+                      variant="ghost"
+                      size="sm"
+                      class="text-destructive hover:text-destructive"
+                    >
+                      Delete
+                    </Button>
+                  </div>
+                </td>
+              </tr>
+            </template>
+          </tbody>
+        </table>
+      </div>
     </div>
   </div>
 </template>

@@ -13,12 +13,12 @@
             "state": {
               "type": "markdown",
               "state": {
-                "file": "Issues/MON-11. Transactions Ingestion + Transactions View.md",
+                "file": "Issues/MON-12. Frontend UI uplift and modernization.md",
                 "mode": "source",
                 "source": false
               },
               "icon": "lucide-file",
-              "title": "MON-11. Transactions Ingestion + Transactions View"
+              "title": "MON-12. Frontend UI uplift and modernization"
             }
           }
         ]
@@ -189,12 +189,32 @@
   },
   "active": "f0f8baf9f7c87f59",
   "lastOpenFiles": [
+    "Issues/MON-12-Implementation-Progress.md",
+    "attachments/sample.zip",
+    "attachments/moneta-dashboard-ui.zip",
+    "attachments/moneta-dash/vite.config.js",
+    "attachments/moneta-dash/tsconfig.json",
+    "attachments/moneta-dash/tailwind.config.js",
+    "attachments/moneta-dash/sample.zip",
+    "attachments/moneta-dash/postcss.config.mjs",
+    "attachments/moneta-dash/pnpm-lock.yaml",
+    "attachments/moneta-dash/package.json",
+    "attachments/moneta-dash/next.config.mjs",
+    "attachments/moneta-dash/public/placeholder.svg",
+    "attachments/moneta-dash/public/placeholder.jpg",
+    "attachments/moneta-dash/public/placeholder-user.jpg",
+    "attachments/moneta-dash/public/icon-dark-32x32.png",
+    "attachments/moneta-dash/public/placeholder-logo.svg",
+    "attachments/moneta-dash/public/icon-light-32x32.png",
+    "attachments/moneta-dash/public/placeholder-logo.png",
+    "attachments/moneta-dash/public/icon.svg",
+    "attachments/moneta-dash/public/apple-icon.png",
+    "attachments/public/placeholder.svg",
+    "Issues/MON-11. Transactions Ingestion + Transactions View.md",
     "Business Logic/Statement File Upload.md",
     "Business Logic/README.md",
     "Business Logic/CSV Metadata Extraction.md",
     "Business Logic/Date Lock Logic.md",
-    "Issues/MON-11. Transactions Ingestion + Transactions View.md",
-    "Business Logic",
     "Issues/MON-11. Statements List UI.md",
     "Issues/MON-10. Statement Upload + List UI (CSV).md",
     "Issues/MON-11-REVIEW.md",
@@ -214,17 +234,7 @@
     "Notes/Feature Implementation Checklist.md",
     "Architecture/frontend/Testing.md",
     "Architecture/frontend/README.md",
-    "Architecture/frontend",
     "Issues/MON-8. Frontend Scaffold (Vue3 + Tailwind Baseline).md",
-    "Architecture/DOCUMENTATION_UPDATES.md",
-    "Notes",
-    "Issues",
-    "Architecture/backend",
-    "Weekly Notes",
-    "templates",
-    "attachments",
-    "Untitled.canvas",
-    "Reporting",
-    "Architecture"
+    "Untitled.canvas"
   ]
 }

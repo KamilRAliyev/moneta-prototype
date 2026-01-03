@@ -83,7 +83,7 @@ describe("AccountTable", () => {
     expect(wrapper.text()).toContain("Credit Card");
   });
 
-  it("shows loading state", () => {
+  it("shows loading state with skeleton loaders", () => {
     const wrapper = mount(AccountTable, {
       props: {
         accounts: [],
@@ -91,7 +91,9 @@ describe("AccountTable", () => {
       },
     });
 
-    expect(wrapper.text()).toContain("Loading accounts...");
+    // Should show skeleton loaders instead of "Loading accounts..." text
+    const skeletons = wrapper.findAll('[class*="animate-pulse"]');
+    expect(skeletons.length).toBeGreaterThan(0);
   });
 
   it("shows empty state", () => {
@@ -109,11 +111,17 @@ describe("AccountTable", () => {
     const wrapper = mount(AccountTable, {
       props: {
         accounts: [mockAccounts[0]],
+        isLoading: false,
       },
     });
 
-    const row = wrapper.find("tbody tr");
-    await row.trigger("click");
+    // Wait for template to render
+    await wrapper.vm.$nextTick();
+
+    const rows = wrapper.findAll("tbody tr");
+    expect(rows.length).toBeGreaterThan(0);
+
+    await rows[0].trigger("click");
 
     expect(wrapper.emitted("view")).toBeTruthy();
     expect(wrapper.emitted("view")?.[0]).toEqual([mockAccounts[0]]);
@@ -123,12 +131,16 @@ describe("AccountTable", () => {
     const wrapper = mount(AccountTable, {
       props: {
         accounts: [mockAccounts[0]],
+        isLoading: false,
       },
     });
+
+    await wrapper.vm.$nextTick();
 
     const editButton = wrapper
       .findAll("button")
       .find((btn) => btn.text().includes("Edit"));
+    expect(editButton).toBeDefined();
     await editButton?.trigger("click");
 
     expect(wrapper.emitted("edit")).toBeTruthy();
@@ -139,12 +151,16 @@ describe("AccountTable", () => {
     const wrapper = mount(AccountTable, {
       props: {
         accounts: [mockAccounts[0]],
+        isLoading: false,
       },
     });
+
+    await wrapper.vm.$nextTick();
 
     const deleteButton = wrapper
       .findAll("button")
       .find((btn) => btn.text().includes("Delete"));
+    expect(deleteButton).toBeDefined();
     await deleteButton?.trigger("click");
 
     expect(wrapper.emitted("delete")).toBeTruthy();
@@ -155,12 +171,16 @@ describe("AccountTable", () => {
     const wrapper = mount(AccountTable, {
       props: {
         accounts: [mockAccounts[0]],
+        isLoading: false,
       },
     });
+
+    await wrapper.vm.$nextTick();
 
     const editButton = wrapper
       .findAll("button")
       .find((btn) => btn.text().includes("Edit"));
+    expect(editButton).toBeDefined();
     await editButton?.trigger("click");
 
     // Should not emit view, only edit

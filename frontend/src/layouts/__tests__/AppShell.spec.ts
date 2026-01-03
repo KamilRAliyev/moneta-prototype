@@ -22,7 +22,7 @@ describe("AppShell", () => {
     });
   };
 
-  it("renders header with logo and navigation", async () => {
+  it("renders sidebar with logo and navigation", async () => {
     const router = createTestRouter();
     const wrapper = mount(AppShell, {
       global: {
@@ -32,14 +32,12 @@ describe("AppShell", () => {
 
     await router.isReady();
 
-    // Check header exists
-    const header = wrapper.find("header");
-    expect(header.exists()).toBe(true);
+    // Check sidebar exists
+    const sidebar = wrapper.find("aside");
+    expect(sidebar.exists()).toBe(true);
 
     // Check logo/brand
-    const logo = wrapper.find('a[href="/"]');
-    expect(logo.exists()).toBe(true);
-    expect(logo.text()).toContain("Moneta");
+    expect(wrapper.text()).toContain("Moneta");
 
     // Check navigation
     const nav = wrapper.find("nav");
@@ -64,7 +62,7 @@ describe("AppShell", () => {
     expect(wrapper.html()).toContain("Test Content");
   });
 
-  it("renders footer", async () => {
+  it("renders header with actions", async () => {
     const router = createTestRouter();
     const wrapper = mount(AppShell, {
       global: {
@@ -74,10 +72,9 @@ describe("AppShell", () => {
 
     await router.isReady();
 
-    // Check footer exists
-    const footer = wrapper.find("footer");
-    expect(footer.exists()).toBe(true);
-    expect(footer.text()).toContain("Moneta");
+    // Check header exists
+    const header = wrapper.find("header");
+    expect(header.exists()).toBe(true);
   });
 
   it("applies active route styling to navigation link", async () => {

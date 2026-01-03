@@ -1,13 +1,14 @@
 import platform
 import os
 import time
+from datetime import datetime, timezone
 import psutil
 
 
 def get_health_info():
     return {
         "status": "ok",
-        "server_time": time.strftime("%Y-%m-%d %H:%M:%S", time.gmtime()),
+        "server_time": datetime.now(timezone.utc).isoformat(),
         "python_version": platform.python_version(),
         "system": platform.system(),
         "hostname": platform.node(),

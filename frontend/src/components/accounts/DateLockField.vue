@@ -68,7 +68,7 @@ const maxDateFrom = computed(() => props.datelockTo || undefined);
             v-model="dateFromValue"
             type="date"
             :max="maxDateFrom"
-            class="flex-1 px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white"
+            class="flex-1 px-3 py-2 border border-input rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-ring focus:border-primary bg-input text-foreground"
             :class="{
               'border-red-500': props.error,
             }"
@@ -99,7 +99,7 @@ const maxDateFrom = computed(() => props.datelockTo || undefined);
             v-model="dateToValue"
             type="date"
             :min="minDateTo"
-            class="flex-1 px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white"
+            class="flex-1 px-3 py-2 border border-input rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-ring focus:border-primary bg-input text-foreground"
             :class="{
               'border-red-500': props.error,
             }"

@@ -24,6 +24,10 @@ describe("AccountsList", () => {
           path: "/accounts",
           component: AccountsList,
         },
+        {
+          path: "/accounts/new",
+          component: { template: "<div>New Account</div>" },
+        },
       ],
     });
   };
@@ -59,6 +63,7 @@ describe("AccountsList", () => {
         account_type: "checking",
         economic_area: "us",
         datelock_from: null,
+        datelock_to: null,
         created_at: "2025-01-01T00:00:00Z",
         updated_at: null,
       },
@@ -89,6 +94,7 @@ describe("AccountsList", () => {
         account_type: "checking",
         economic_area: "us",
         datelock_from: null,
+        datelock_to: null,
         created_at: "2025-01-01T00:00:00Z",
         updated_at: null,
       },
@@ -143,6 +149,7 @@ describe("AccountsList", () => {
         account_type: "checking",
         economic_area: null,
         datelock_from: null,
+        datelock_to: null,
         created_at: "2025-01-01T00:00:00Z",
         updated_at: null,
       },
@@ -183,6 +190,7 @@ describe("AccountsList", () => {
         account_type: "checking",
         economic_area: null,
         datelock_from: null,
+        datelock_to: null,
         created_at: "2025-01-01T00:00:00Z",
         updated_at: null,
       },

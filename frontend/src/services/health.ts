@@ -4,12 +4,16 @@ export interface HealthInfo {
   ok: boolean;
   timestamp?: string;
   version?: string;
+  pythonVersion?: string;
+  uptimeSeconds?: number;
 }
 
 interface BackendHealthResponse {
   status: string;
   server_time?: string;
   app_version?: string;
+  python_version?: string;
+  uptime_seconds?: number;
   [key: string]: unknown;
 }
 
@@ -27,6 +31,8 @@ export const healthService = {
       ok: response.data.status === "ok",
       timestamp: response.data.server_time,
       version: response.data.app_version,
+      pythonVersion: response.data.python_version,
+      uptimeSeconds: response.data.uptime_seconds,
     };
   },
 };

@@ -1,5 +1,7 @@
 <script setup lang="ts">
 import { ref, onMounted } from "vue";
+import { Button } from "@/components/ui/button";
+import { X } from "lucide-vue-next";
 import { accountsService } from "../../services/accounts";
 import type { Account } from "../../types/accounts";
 
@@ -125,7 +127,7 @@ const clearFile = () => {
         id="account"
         v-model="selectedAccountId"
         :disabled="isLoadingAccounts || props.isLoading"
-        class="block w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white"
+        class="block w-full px-3 py-2 border border-input rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-ring focus:border-ring bg-background text-foreground"
         :class="{ 'border-red-500': errors.account }"
       >
         <option :value="null">Select an account...</option>
@@ -137,10 +139,7 @@ const clearFile = () => {
           {{ account.name }} ({{ account.institution }})
         </option>
       </select>
-      <p
-        v-if="errors.account"
-        class="mt-1 text-sm text-red-600 dark:text-red-400"
-      >
+      <p v-if="errors.account" class="mt-1 text-sm text-destructive">
         {{ errors.account }}
       </p>
     </div>
@@ -160,7 +159,7 @@ const clearFile = () => {
         class="border-2 border-dashed rounded-lg p-8 text-center transition-colors"
         :class="
           isDragging
-            ? 'border-blue-500 bg-blue-50 dark:bg-blue-900/20'
+            ? 'border-primary bg-primary/10'
             : 'border-gray-300 dark:border-gray-600 hover:border-gray-400 dark:hover:border-gray-500'
         "
       >
@@ -178,7 +177,7 @@ const clearFile = () => {
           :class="{ 'pointer-events-none opacity-50': props.isLoading }"
         >
           <svg
-            class="mx-auto h-12 w-12 text-gray-400 dark:text-gray-500"
+            class="mx-auto h-12 w-12 text-muted-foreground"
             stroke="currentColor"
             fill="none"
             viewBox="0 0 48 48"
@@ -190,13 +189,11 @@ const clearFile = () => {
               stroke-linejoin="round"
             />
           </svg>
-          <p class="mt-2 text-sm text-gray-600 dark:text-gray-400">
-            <span class="font-medium text-blue-600 dark:text-blue-400"
-              >Click to upload</span
-            >
+          <p class="mt-2 text-sm text-muted-foreground">
+            <span class="font-medium text-primary">Click to upload</span>
             or drag and drop
           </p>
-          <p class="mt-1 text-xs text-gray-500 dark:text-gray-500">
+          <p class="mt-1 text-xs text-muted-foreground">
             CSV files only (max 50MB)
           </p>
         </label>
@@ -205,7 +202,7 @@ const clearFile = () => {
       <!-- Selected File Display -->
       <div
         v-if="selectedFile"
-        class="mt-4 p-4 bg-gray-50 dark:bg-gray-700 rounded-md flex items-center justify-between"
+        class="mt-4 p-4 bg-muted rounded-md flex items-center justify-between"
       >
         <div class="flex items-center gap-3">
           <svg
@@ -222,34 +219,24 @@ const clearFile = () => {
             />
           </svg>
           <div>
-            <p class="text-sm font-medium text-gray-900 dark:text-white">
+            <p class="text-sm font-medium text-foreground">
               {{ selectedFile.name }}
             </p>
-            <p class="text-xs text-gray-500 dark:text-gray-400">
+            <p class="text-xs text-muted-foreground">
               {{ (selectedFile.size / 1024).toFixed(2) }} KB
             </p>
           </div>
         </div>
-        <button
+        <Button
           @click="clearFile"
           type="button"
-          class="text-red-600 dark:text-red-400 hover:text-red-800 dark:hover:text-red-300"
+          variant="ghost"
+          size="icon"
           :disabled="props.isLoading"
+          class="text-destructive hover:text-destructive"
         >
-          <svg
-            class="h-5 w-5"
-            fill="none"
-            stroke="currentColor"
-            viewBox="0 0 24 24"
-          >
-            <path
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              stroke-width="2"
-              d="M6 18L18 6M6 6l12 12"
-            />
-          </svg>
-        </button>
+          <X class="h-4 w-4" />
+        </Button>
       </div>
 
       <p v-if="errors.file" class="mt-1 text-sm text-red-600 dark:text-red-400">
@@ -260,22 +247,21 @@ const clearFile = () => {
     <!-- Error Message -->
     <div
       v-if="props.error"
-      class="p-4 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-md"
+      class="p-4 bg-destructive/10 border border-destructive/20 rounded-md"
     >
-      <p class="text-sm text-red-800 dark:text-red-200">
+      <p class="text-sm text-destructive">
         {{ props.error }}
       </p>
     </div>
 
     <!-- Upload Button -->
     <div class="flex justify-end">
-      <button
+      <Button
         @click="handleUpload"
         :disabled="props.isLoading || !selectedFile || !selectedAccountId"
-        class="px-6 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
       >
         {{ props.isLoading ? "Uploading..." : "Upload Statement" }}
-      </button>
+      </Button>
     </div>
   </div>
 </template>

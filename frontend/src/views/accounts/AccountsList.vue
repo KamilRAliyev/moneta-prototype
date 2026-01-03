@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { ref, onMounted } from "vue";
 import { useRouter } from "vue-router";
+import { Button } from "@/components/ui/button";
 import { accountsService } from "../../services/accounts";
 import AccountTable from "../../components/accounts/AccountTable.vue";
 import type { Account } from "../../types/accounts";
@@ -65,12 +66,9 @@ onMounted(() => {
   <div class="space-y-6 w-full">
     <!-- Header -->
     <div class="flex justify-between items-center">
-      <h1 class="text-3xl font-bold text-gray-900 dark:text-white">Accounts</h1>
-      <router-link
-        to="/accounts/new"
-        class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors"
-      >
-        Create Account
+      <h1 class="text-3xl font-bold text-foreground">Accounts</h1>
+      <router-link to="/accounts/new">
+        <Button>Create Account</Button>
       </router-link>
     </div>
 

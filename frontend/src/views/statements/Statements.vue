@@ -91,10 +91,8 @@ onMounted(() => {
   <div class="space-y-6 w-full">
     <!-- Header -->
     <div>
-      <h1 class="text-3xl font-bold text-gray-900 dark:text-white">
-        Statements
-      </h1>
-      <p class="mt-2 text-sm text-gray-600 dark:text-gray-400">
+      <h1 class="text-3xl font-bold text-foreground">Statements</h1>
+      <p class="mt-2 text-sm text-muted-foreground">
         Upload and manage CSV statement files for your accounts
       </p>
     </div>
@@ -102,16 +100,16 @@ onMounted(() => {
     <!-- Error Message -->
     <div
       v-if="store.error"
-      class="p-4 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-md"
+      class="p-4 bg-destructive/10 border border-destructive/20 rounded-md"
     >
-      <p class="text-sm text-red-800 dark:text-red-200">
+      <p class="text-sm text-destructive">
         {{ store.error }}
       </p>
     </div>
 
     <!-- Upload Section -->
-    <div class="bg-white dark:bg-gray-800 shadow rounded-lg p-6">
-      <h2 class="text-xl font-semibold text-gray-900 dark:text-white mb-4">
+    <div class="bg-card shadow rounded-lg p-6">
+      <h2 class="text-xl font-semibold text-foreground mb-4">
         Upload Statement
       </h2>
       <StatementUpload
@@ -122,8 +120,8 @@ onMounted(() => {
     </div>
 
     <!-- Statements Table -->
-    <div class="bg-white dark:bg-gray-800 shadow rounded-lg p-6">
-      <h2 class="text-xl font-semibold text-gray-900 dark:text-white mb-4">
+    <div class="bg-card shadow rounded-lg p-6">
+      <h2 class="text-xl font-semibold text-foreground mb-4">
         Uploaded Statements
       </h2>
       <StatementTable
@@ -142,29 +140,23 @@ onMounted(() => {
       @click="cancelDelete"
     >
       <div
-        class="bg-white dark:bg-gray-800 rounded-lg shadow-xl p-6 max-w-md w-full mx-4"
+        class="bg-card rounded-lg shadow-xl p-6 max-w-md w-full mx-4"
         @click.stop
       >
-        <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">
+        <h3 class="text-lg font-semibold text-foreground mb-4">
           Delete Statement
         </h3>
-        <p class="text-gray-600 dark:text-gray-400 mb-6">
+        <p class="text-muted-foreground mb-6">
           Are you sure you want to delete this statement file? This action
           cannot be undone and will also delete the file from the server.
         </p>
         <div class="flex justify-end gap-3">
-          <button
-            @click="cancelDelete"
-            class="px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-md hover:bg-gray-50 dark:hover:bg-gray-600 transition-colors"
-          >
+          <Button @click="cancelDelete" variant="outline" size="sm">
             Cancel
-          </button>
-          <button
-            @click="confirmDelete"
-            class="px-4 py-2 text-sm font-medium text-white bg-red-600 rounded-md hover:bg-red-700 transition-colors"
-          >
+          </Button>
+          <Button @click="confirmDelete" variant="destructive" size="sm">
             Delete
-          </button>
+          </Button>
         </div>
       </div>
     </div>

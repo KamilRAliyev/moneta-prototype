@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { ref, computed, onMounted } from "vue";
+import { Button } from "@/components/ui/button";
 import { useAccountMeta } from "../../composables/useAccountMeta";
 import DateLockField from "./DateLockField.vue";
 import type {
@@ -124,10 +125,7 @@ const handleCancel = () => {
   <form @submit.prevent="handleSubmit" class="space-y-6">
     <!-- Name -->
     <div>
-      <label
-        for="name"
-        class="block text-sm font-medium text-gray-700 dark:text-gray-300"
-      >
+      <label for="name" class="block text-sm font-medium text-foreground">
         Account Name <span class="text-red-500">*</span>
       </label>
       <input
@@ -135,10 +133,10 @@ const handleCancel = () => {
         v-model="name"
         type="text"
         required
-        class="mt-1 block w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white"
-        :class="{ 'border-red-500': errors.name }"
+        class="mt-1 block w-full px-3 py-2 border border-input rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-ring focus:border-ring bg-background text-foreground"
+        :class="{ 'border-destructive': errors.name }"
       />
-      <p v-if="errors.name" class="mt-1 text-sm text-red-600 dark:text-red-400">
+      <p v-if="errors.name" class="mt-1 text-sm text-destructive">
         {{ errors.name }}
       </p>
     </div>
@@ -147,7 +145,7 @@ const handleCancel = () => {
     <div>
       <label
         for="institution"
-        class="block text-sm font-medium text-gray-700 dark:text-gray-300"
+        class="block text-sm font-medium text-foreground"
       >
         Institution <span class="text-red-500">*</span>
       </label>
@@ -156,7 +154,7 @@ const handleCancel = () => {
         v-model="institution"
         type="text"
         required
-        class="mt-1 block w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white"
+        class="mt-1 block w-full px-3 py-2 border border-input rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-ring focus:border-ring bg-background text-foreground"
         :class="{ 'border-red-500': errors.institution }"
       />
       <p
@@ -169,17 +167,14 @@ const handleCancel = () => {
 
     <!-- Currency -->
     <div>
-      <label
-        for="currency"
-        class="block text-sm font-medium text-gray-700 dark:text-gray-300"
-      >
+      <label for="currency" class="block text-sm font-medium text-foreground">
         Currency <span class="text-red-500">*</span>
       </label>
       <select
         id="currency"
         v-model="currency"
         required
-        class="mt-1 block w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white"
+        class="mt-1 block w-full px-3 py-2 border border-input rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-ring focus:border-ring bg-background text-foreground"
         :class="{ 'border-red-500': errors.currency }"
         :disabled="isLoadingMeta"
       >
@@ -200,7 +195,7 @@ const handleCancel = () => {
     <div>
       <label
         for="accountType"
-        class="block text-sm font-medium text-gray-700 dark:text-gray-300"
+        class="block text-sm font-medium text-foreground"
       >
         Account Type <span class="text-red-500">*</span>
       </label>
@@ -208,7 +203,7 @@ const handleCancel = () => {
         id="accountType"
         v-model="accountType"
         required
-        class="mt-1 block w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white"
+        class="mt-1 block w-full px-3 py-2 border border-input rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-ring focus:border-ring bg-background text-foreground"
         :class="{ 'border-red-500': errors.accountType }"
         :disabled="isLoadingMeta"
       >
@@ -233,14 +228,14 @@ const handleCancel = () => {
     <div>
       <label
         for="economicArea"
-        class="block text-sm font-medium text-gray-700 dark:text-gray-300"
+        class="block text-sm font-medium text-foreground"
       >
         Economic Area
       </label>
       <select
         id="economicArea"
         v-model="economicArea"
-        class="mt-1 block w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white"
+        class="mt-1 block w-full px-3 py-2 border border-input rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-ring focus:border-ring bg-background text-foreground"
         :disabled="isLoadingMeta"
       >
         <option :value="null">None</option>
@@ -266,9 +261,9 @@ const handleCancel = () => {
     <!-- Error Message -->
     <div
       v-if="props.error"
-      class="p-4 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-md"
+      class="p-4 bg-destructive/10 border border-destructive/20 rounded-md"
     >
-      <p class="text-sm text-red-800 dark:text-red-200">
+      <p class="text-sm text-destructive">
         {{ props.error }}
       </p>
     </div>
@@ -277,18 +272,10 @@ const handleCancel = () => {
     <div
       class="flex justify-end gap-3 pt-4 border-t border-gray-200 dark:border-gray-700"
     >
-      <button
-        type="button"
-        @click="handleCancel"
-        class="px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-md hover:bg-gray-50 dark:hover:bg-gray-600 transition-colors"
-      >
+      <Button type="button" @click="handleCancel" variant="outline">
         Cancel
-      </button>
-      <button
-        type="submit"
-        :disabled="props.isLoading || isLoadingMeta"
-        class="px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-md hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-      >
+      </Button>
+      <Button type="submit" :disabled="props.isLoading || isLoadingMeta">
         {{
           props.isLoading
             ? "Saving..."
@@ -296,7 +283,7 @@ const handleCancel = () => {
               ? "Save Changes"
               : "Create Account"
         }}
-      </button>
+      </Button>
     </div>
   </form>
 </template>

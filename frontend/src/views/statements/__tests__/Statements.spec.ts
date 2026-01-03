@@ -49,7 +49,6 @@ describe("Statements", () => {
   });
 
   it("displays statements in table", async () => {
-    const store = useStatementsStore();
     const mockStatements: StatementFileSummary[] = [
       {
         id: "550e8400-e29b-41d4-a716-446655440000",
@@ -68,11 +67,14 @@ describe("Statements", () => {
       },
     ];
 
-    store.statements = mockStatements;
+    // Mock the service to return the test statements
+    mockedStatementsService.listStatements.mockResolvedValue(mockStatements);
 
     const wrapper = mount(Statements);
 
+    // Wait for the component to mount and load statements
     await wrapper.vm.$nextTick();
+    await new Promise((resolve) => setTimeout(resolve, 100));
 
     expect(wrapper.text()).toContain("test.csv");
     expect(wrapper.text()).toContain("Test Account");
@@ -99,7 +101,6 @@ describe("Statements", () => {
   });
 
   it("shows delete confirmation modal when delete is clicked", async () => {
-    const store = useStatementsStore();
     const mockStatement: StatementFileSummary = {
       id: "550e8400-e29b-41d4-a716-446655440000",
       account_id: 1,
@@ -116,10 +117,12 @@ describe("Statements", () => {
       created_at: "2025-12-26T10:00:00Z",
     };
 
-    store.statements = [mockStatement];
+    // Mock the service to return the test statement
+    mockedStatementsService.listStatements.mockResolvedValue([mockStatement]);
 
     const wrapper = mount(Statements);
     await wrapper.vm.$nextTick();
+    await new Promise((resolve) => setTimeout(resolve, 100));
 
     const tableComponent = wrapper.findComponent({ name: "StatementTable" });
     if (tableComponent.exists()) {
@@ -153,10 +156,12 @@ describe("Statements", () => {
       created_at: "2025-12-26T10:00:00Z",
     };
 
-    store.statements = [mockStatement];
+    // Mock the service to return the test statement
+    mockedStatementsService.listStatements.mockResolvedValue([mockStatement]);
 
     const wrapper = mount(Statements);
     await wrapper.vm.$nextTick();
+    await new Promise((resolve) => setTimeout(resolve, 100));
 
     // Trigger delete
     const vm = wrapper.vm as any;

@@ -3,13 +3,14 @@ import { mount } from "@vue/test-utils";
 import { createRouter, createMemoryHistory } from "vue-router";
 import AccountDetail from "../AccountDetail.vue";
 import { accountsService } from "../../../services/accounts";
-import type { Account } from "../../../types/accounts";
+import type { Account, MetaOptionsResponse } from "../../../types/accounts";
 
 // Mock the accounts service
 vi.mock("../../../services/accounts", () => ({
   accountsService: {
     getAccount: vi.fn(),
     updateAccount: vi.fn(),
+    getAccountMetaOptions: vi.fn(),
   },
 }));
 
@@ -34,6 +35,21 @@ describe("AccountDetail", () => {
 
   beforeEach(() => {
     vi.clearAllMocks();
+    // Setup default mock for getAccountMetaOptions
+    mockedAccountsService.getAccountMetaOptions.mockResolvedValue({
+      account_types: [
+        { value: "checking", label: "Checking" },
+        { value: "savings", label: "Savings" },
+      ],
+      economic_areas: [
+        { value: "us", label: "United States" },
+        { value: "eu", label: "European Union" },
+      ],
+      currencies: [
+        { code: "USD", name: "US Dollar", digits: 2 },
+        { code: "EUR", name: "Euro", digits: 2 },
+      ],
+    } as MetaOptionsResponse);
   });
 
   it("renders page title with account name", async () => {
@@ -45,6 +61,7 @@ describe("AccountDetail", () => {
       account_type: "checking",
       economic_area: "us",
       datelock_from: null,
+      datelock_to: null,
       created_at: "2025-01-01T00:00:00Z",
       updated_at: null,
     };
@@ -76,6 +93,7 @@ describe("AccountDetail", () => {
       account_type: "checking",
       economic_area: null,
       datelock_from: null,
+      datelock_to: null,
       created_at: "2025-01-01T00:00:00Z",
       updated_at: null,
     };
@@ -129,6 +147,7 @@ describe("AccountDetail", () => {
       account_type: "checking",
       economic_area: null,
       datelock_from: null,
+      datelock_to: null,
       created_at: "2025-01-01T00:00:00Z",
       updated_at: null,
     });
@@ -173,6 +192,7 @@ describe("AccountDetail", () => {
       account_type: "checking",
       economic_area: null,
       datelock_from: null,
+      datelock_to: null,
       created_at: "2025-01-01T00:00:00Z",
       updated_at: null,
     };
@@ -219,6 +239,7 @@ describe("AccountDetail", () => {
       account_type: "checking",
       economic_area: null,
       datelock_from: null,
+      datelock_to: null,
       created_at: "2025-01-01T00:00:00Z",
       updated_at: null,
     };

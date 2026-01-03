@@ -45,8 +45,7 @@ repos:
         entry: bash -c 'cd frontend && npm run test:run'
         language: system
         pass_filenames: false
-        files: ^frontend/
-        types_or: [javascript, jsx, ts, tsx, vue]
+        files: ^frontend/src/.*\.(ts|js|tsx|jsx|vue)$|^frontend/.*\.(spec|test)\.(ts|js|tsx|jsx|vue)$
         always_run: false
 
   # General hooks for both
