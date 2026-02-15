@@ -11,6 +11,11 @@ services:
       - "5432:5432"
     volumes:
       - pgdata:/var/lib/postgresql/data
+      # Allow connections from app/pgadmin containers on Docker network
+      - ../postgres/pg_hba.conf:/var/lib/postgresql/data/pg_hba.conf
+      # Init script and pg_hba for first-time init (so initdb doesn't leave default only)
+      - ../postgres/pg_hba.conf:/docker-entrypoint-initdb.d/pg_hba.conf:ro
+      - ../postgres/01-setup-pg_hba.sh:/docker-entrypoint-initdb.d/01-setup-pg_hba.sh:ro
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U moneta"]
       interval: 30s

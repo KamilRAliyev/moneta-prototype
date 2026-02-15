@@ -20,8 +20,35 @@
               "icon": "lucide-file",
               "title": "MON-12. Frontend UI uplift and modernization"
             }
+          },
+          {
+            "id": "1eca897c0d656d73",
+            "type": "leaf",
+            "state": {
+              "type": "release-notes",
+              "state": {
+                "currentVersion": "1.11.5"
+              },
+              "icon": "lucide-book-up",
+              "title": "Release Notes 1.11.5"
+            }
+          },
+          {
+            "id": "78efe663c1d9c999",
+            "type": "leaf",
+            "state": {
+              "type": "markdown",
+              "state": {
+                "file": "Notes/Dev Cheat Sheet.md",
+                "mode": "source",
+                "source": false
+              },
+              "icon": "lucide-file",
+              "title": "Dev Cheat Sheet"
+            }
           }
-        ]
+        ],
+        "currentTab": 2
       }
     ],
     "direction": "vertical"
@@ -53,7 +80,7 @@
             "state": {
               "type": "search",
               "state": {
-                "query": "",
+                "query": "poetry env",
                 "matchingCase": false,
                 "explainSearch": false,
                 "collapseAll": false,
@@ -94,8 +121,8 @@
             "state": {
               "type": "backlink",
               "state": {
-                "file": "Kanban Board.md",
-                "collapseAll": false,
+                "file": "Notes/Dev Cheat Sheet.md",
+                "collapseAll": true,
                 "extraContext": false,
                 "sortOrder": "alphabetical",
                 "showSearch": false,
@@ -104,7 +131,7 @@
                 "unlinkedCollapsed": true
               },
               "icon": "links-coming-in",
-              "title": "Backlinks for Kanban Board"
+              "title": "Backlinks for Dev Cheat Sheet"
             }
           },
           {
@@ -142,13 +169,13 @@
             "state": {
               "type": "outline",
               "state": {
-                "file": "Kanban Board.md",
+                "file": "Notes/Dev Cheat Sheet.md",
                 "followCursor": false,
                 "showSearch": false,
                 "searchQuery": ""
               },
               "icon": "lucide-list",
-              "title": "Outline of Kanban Board"
+              "title": "Outline of Dev Cheat Sheet"
             }
           },
           {
@@ -165,7 +192,8 @@
               "title": "All properties"
             }
           }
-        ]
+        ],
+        "currentTab": 3
       }
     ],
     "direction": "horizontal",
@@ -181,15 +209,25 @@
       "templates:Insert template": false,
       "command-palette:Open command palette": false,
       "bases:Create new base": false,
-      "obsidian-kanban:Create new board": false,
+      "periodic-notes:Open this week": false,
       "table-editor-obsidian:Advanced Tables Toolbar": false,
-      "templater-obsidian:Templater": false,
-      "periodic-notes:Open this week": false
+      "obsidian-kanban:Create new board": false,
+      "templater-obsidian:Templater": false
     }
   },
-  "active": "f0f8baf9f7c87f59",
+  "active": "78efe663c1d9c999",
   "lastOpenFiles": [
+    "Notes/Feature Implementation Checklist.md",
+    "Notes/Dev Cheat Sheet.md",
+    "Business Logic/CSV Metadata Extraction.md",
     "Issues/MON-12-Implementation-Progress.md",
+    "Issues/MON-12. Frontend UI uplift and modernization.md",
+    "Weekly Notes/2025-W52.md",
+    "Architecture/frontend/Testing.md",
+    "Architecture/frontend/README.md",
+    "Architecture/frontend/Frontend Package Structure.md",
+    "Architecture/frontend/Frontend Architecture.md",
+    "Architecture/backend/Logging.md",
     "attachments/sample.zip",
     "attachments/moneta-dashboard-ui.zip",
     "attachments/moneta-dash/vite.config.js",
@@ -213,7 +251,6 @@
     "Issues/MON-11. Transactions Ingestion + Transactions View.md",
     "Business Logic/Statement File Upload.md",
     "Business Logic/README.md",
-    "Business Logic/CSV Metadata Extraction.md",
     "Business Logic/Date Lock Logic.md",
     "Issues/MON-11. Statements List UI.md",
     "Issues/MON-10. Statement Upload + List UI (CSV).md",
@@ -225,16 +262,7 @@
     "Architecture/backend/API Endpoints.md",
     "Architecture/backend/Backend Package Structure.md",
     "Architecture/backend/Database.md",
-    "Architecture/backend/Logging.md",
     "Architecture/backend/Testing.md",
-    "Architecture/frontend/Frontend Architecture.md",
-    "Issues/MON-9 — Accounts UI (Vue + Tailwind).md",
-    "Architecture/frontend/Frontend Package Structure.md",
-    "Notes/Dev Cheat Sheet.md",
-    "Notes/Feature Implementation Checklist.md",
-    "Architecture/frontend/Testing.md",
-    "Architecture/frontend/README.md",
-    "Issues/MON-8. Frontend Scaffold (Vue3 + Tailwind Baseline).md",
     "Untitled.canvas"
   ]
 }

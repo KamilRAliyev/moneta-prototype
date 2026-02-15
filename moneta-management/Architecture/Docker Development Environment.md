@@ -134,9 +134,12 @@ graph TB
 - Health check configured (`pg_isready`)
 - Persistent data stored in `pgdata` volume
 - Environment variables from `env/dev.env`
+- **Custom `pg_hba.conf`** allows connections from the Docker network (app, pgAdmin) and from the host (e.g. `poetry run alembic upgrade head` or `psql` to `localhost:5432`). See `deploy/postgres/pg_hba.conf`.
 
 **Volume Mounts**:
 - `pgdata:/var/lib/postgresql/data` - Database files
+- `../postgres/pg_hba.conf:/var/lib/postgresql/data/pg_hba.conf` - Client authentication (Docker + host)
+- `../postgres/pg_hba.conf` and `../postgres/01-setup-pg_hba.sh` in `docker-entrypoint-initdb.d` - Apply same config on first DB init
 
 **Health Check**:
 - Command: `pg_isready -U $POSTGRES_USER`
@@ -246,6 +249,9 @@ illiterate_monkey/
     ├── docker/
     │   ├── Dockerfile         # App container image (Python + Node.js)
     │   └── entrypoint.sh      # Container startup script (runs both services)
+    ├── postgres/
+    │   ├── pg_hba.conf        # PostgreSQL client auth (Docker network + host)
+    │   └── 01-setup-pg_hba.sh # Init script to apply pg_hba on first DB init
     └── compose/
         └── docker-compose-dev.yml  # Service definitions
 ```

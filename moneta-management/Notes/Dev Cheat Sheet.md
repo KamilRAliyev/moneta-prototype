@@ -102,6 +102,8 @@ npm run test:run
 
 7️⃣ Database Migrations (Alembic)
 
+**Note**: With Docker running, you can run Alembic from the host (e.g. `poetry run alembic upgrade head`); PostgreSQL is configured to accept connections from the host via `deploy/postgres/pg_hba.conf`.
+
 Create a new migration:
 ```bash
 cd backend

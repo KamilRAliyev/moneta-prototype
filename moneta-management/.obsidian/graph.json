@@ -1,0 +1,51 @@
+{
+  "collapse-filter": false,
+  "search": "",
+  "showTags": false,
+  "showAttachments": false,
+  "hideUnresolved": true,
+  "showOrphans": true,
+  "collapse-color-groups": false,
+  "colorGroups": [
+    {
+      "query": "path:Architecture  ",
+      "color": {
+        "a": 1,
+        "rgb": 14701138
+      }
+    },
+    {
+      "query": "path:\"Business Logic\"  ",
+      "color": {
+        "a": 1,
+        "rgb": 14701138
+      }
+    },
+    {
+      "query": "path:Issues  ",
+      "color": {
+        "a": 1,
+        "rgb": 16772388
+      }
+    },
+    {
+      "query": "path:Notes  ",
+      "color": {
+        "a": 1,
+        "rgb": 5431378
+      }
+    }
+  ],
+  "collapse-display": false,
+  "showArrow": false,
+  "textFadeMultiplier": -0.6,
+  "nodeSizeMultiplier": 1.20377604166667,
+  "lineSizeMultiplier": 1.57276475694444,
+  "collapse-forces": false,
+  "centerStrength": 0.287369791666667,
+  "repelStrength": 10,
+  "linkStrength": 1,
+  "linkDistance": 178,
+  "scale": 0.7054736990304592,
+  "close": false
+}
